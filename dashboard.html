@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — Apex Mining</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter','sans-serif'], display: ['Space Grotesk','sans-serif'] },
+                    colors: { navy: {900:'#0a0e1a',800:'#0f172a',700:'#1e293b'}, cyan: {brand:'#06b6d4',glow:'#22d3ee'}, gold: {brand:'#f59e0b',glow:'#fbbf24'} }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #0a0e1a; }
+        .gradient-text { background: linear-gradient(135deg, #22d3ee, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .glass-card { background: rgba(15,23,42,0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); }
+        .btn-shine { position: relative; overflow: hidden; }
+        .btn-shine::after { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transition: left 0.5s; }
+        .btn-shine:hover::after { left: 100%; }
+        .hover-lift { transition: transform 0.3s, box-shadow 0.3s; }
+        .hover-lift:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: #0f172a; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+    </style>
+</head>
+<body class="text-slate-300 min-h-screen">
+
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-navy-900/90 backdrop-blur-xl border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            <div class="py-1.5 border-b border-slate-800/50 overflow-hidden">
+                <div id="header-ticker" class="text-xs text-slate-400 flex items-center gap-4 whitespace-nowrap">
+                    <span style="display:inline-block;width:256px;height:16px;background:linear-gradient(90deg,#1e293b 25%,#334155 50%,#1e293b 75%);background-size:200% 100%;border-radius:4px;animation:shimmer 1.5s infinite;"></span>
+                </div>
+            </div>
+            <div class="flex items-center justify-between h-16">
+                <a href="./index.html" class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-brand to-cyan-glow flex items-center justify-center">
+                        <i class="fa-solid fa-mountain text-navy-900 text-sm"></i>
+                    </div>
+                    <span class="font-display font-bold text-xl text-white tracking-tight">Apex<span class="text-cyan-brand">Mining</span></span>
+                </a>
+                <nav class="hidden md:flex items-center gap-1">
+                    <a href="./index.html" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40 transition-all">Home</a>
+                    <a href="./mining.html" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40 transition-all">Mining</a>
+                    <a href="./courses.html" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40 transition-all">Courses</a>
+                    <a href="./investments.html" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40 transition-all">Investments</a>
+                    <a href="./dashboard.html" class="px-3 py-2 rounded-lg text-sm font-medium text-white bg-slate-800/60">Dashboard</a>
+                    <a href="./markets.html" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40 transition-all">Markets</a>
+                    <a href="./about.html" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40 transition-all">About</a>
+                </nav>
+                <div class="flex items-center gap-3">
+                    <div id="auth-buttons" class="hidden md:flex items-center gap-2">
+                        <button onclick="openModal('login-modal')" class="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white transition-colors">Log In</button>
+                        <button onclick="openModal('signup-modal')" class="px-4 py-2 text-sm font-medium bg-cyan-brand text-navy-900 rounded-lg hover:bg-cyan-glow transition-colors btn-shine font-semibold">Sign Up</button>
+                    </div>
+                    <div id="user-menu" class="hidden md:flex items-center gap-3">
+                        <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800/60 border border-slate-700">
+                            <div class="w-7 h-7 rounded-full bg-gradient-to-br from-cyan-brand to-cyan-glow flex items-center justify-center text-navy-900 text-xs font-bold"><i class="fa-solid fa-user"></i></div>
+                            <span id="user-name-display" class="text-sm font-medium text-white">User</span>
+                        </div>
+                        <button id="logout-btn" class="text-slate-400 hover:text-red-400 transition-colors text-sm"><i class="fa-solid fa-right-from-bracket"></i></button>
+                    </div>
+                    <button id="mobile-menu-toggle" class="md:hidden p-2 text-slate-400 hover:text-white"><i class="fa-solid fa-bars text-lg"></i></button>
+                </div>
+            </div>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden bg-navy-900 border-t border-slate-800">
+            <div class="px-4 py-3 space-y-1">
+                <a href="./index.html" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40">Home</a>
+                <a href="./mining.html" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40">Mining</a>
+                <a href="./courses.html" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40">Courses</a>
+                <a href="./investments.html" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40">Investments</a>
+                <a href="./dashboard.html" class="block px-3 py-2 rounded-lg text-sm font-medium text-white bg-slate-800">Dashboard</a>
+                <a href="./markets.html" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40">Markets</a>
+                <a href="./about.html" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40">About</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="pt-[104px]">
+        <!-- Dashboard Header -->
+        <section class="py-8 border-b border-slate-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h1 id="dashboard-welcome" class="font-display text-3xl font-bold text-white mb-1">Welcome, Guest</h1>
+                        <p class="text-slate-400 text-sm">Portfolio overview and asset management</p>
+                    </div>
+                    <div class="flex gap-3">
+                        <a href="./mining.html" class="px-5 py-2.5 border border-slate-600 text-white rounded-lg text-sm font-medium hover:border-slate-400 transition-all">
+                            <i class="fa-solid fa-microchip mr-2"></i>Mining
+                        </a>
+                        <button onclick="document.getElementById('withdrawal-section').scrollIntoView({behavior:'smooth'})" class="px-5 py-2.5 bg-cyan-brand text-navy-900 rounded-lg text-sm font-semibold hover:bg-cyan-glow transition-all btn-shine">
+                            <i class="fa-solid fa-money-bill-transfer mr-2"></i>Withdraw
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Balance Cards -->
+        <section class="py-8">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6">
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                    <div class="glass-card rounded-xl p-5 border-l-4 border-cyan-brand">
+                        <div class="text-xs text-slate-500 mb-1 uppercase tracking-wider">Total Portfolio Balance</div>
+                        <div class="text-2xl font-bold text-white font-display">$17,820.00</div>
+                        <div class="text-xs text-emerald-400 mt-1 flex items-center gap-1"><i class="fa-solid fa-arrow-trend-up"></i> +2.4% (24h)</div>
+                    </div>
+                    <div class="glass-card rounded-xl p-5 border-l-4 border-emerald-500">
+                        <div class="text-xs text-slate-500 mb-1 uppercase tracking-wider">Mining Earnings</div>
+                        <div class="text-2xl font-bold text-emerald-400 font-display">+$1,247.80</div>
+                        <div class="text-xs text-slate-400 mt-1">≈ 0.0119 BTC / day</div>
+                    </div>
+                    <div class="glass-card rounded-xl p-5 border-l-4 border-gold-brand">
+                        <div class="text-xs text-slate-500 mb-1 uppercase tracking-wider">Investment Returns</div>
+                        <div class="text-2xl font-bold text-gold-brand font-display">+$428.50</div>
+                        <div class="text-xs text-slate-400 mt-1">YTD return: +8.2%</div>
+                    </div>
+                    <div class="glass-card rounded-xl p-5 border-l-4 border-purple-500">
+                        <div class="text-xs text-slate-500 mb-1 uppercase tracking-wider">Available for Withdrawal</div>
+                        <div class="text-2xl font-bold text-white font-display">$12,450.00</div>
+                        <div class="text-xs text-slate-400 mt-1">Min. withdrawal: $100</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Asset Allocation + Chart -->
+        <section class="py-8">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6">
+                <div class="grid lg:grid-cols-3 gap-6">
+                    <!-- Asset Breakdown -->
+                    <div class="lg:col-span-2 glass-card rounded-xl p-6">
+                        <h3 class="text-lg font-semibold text-white mb-6">Asset Allocation</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-sm mb-2">
+                                    <span class="text-slate-300 flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-amber-500"></span> Bitcoin (BTC)</span>
+                                    <span class="text-white font-mono">$8,019.00 <span class="text-slate-500">(45%)</span></span>
+                                </div>
+                                <div class="h-2 bg-slate-800 rounded-full overflow-hidden">
+                                    <div class="h-full bg-amber-500 rounded-full" style="width:45%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-2">
+                                    <span class="text-slate-300 flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-cyan-brand"></span> Ethereum (ETH)</span>
+                                    <span class="text-white font-mono">$4,455.00 <span class="text-slate-500">(25%)</span></span>
+                                </div>
+                                <div class="h-2 bg-slate-800 rounded-full overflow-hidden">
+                                    <div class="h-full bg-cyan-brand rounded-full" style="width:25%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-2">
+                                    <span class="text-slate-300 flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-purple-500"></span> Solana (SOL)</span>
+                                    <span class="text-white font-mono">$2,673.00 <span class="text-slate-500">(15%)</span></span>
+                                </div>
+                                <div class="h-2 bg-slate-800 rounded-full overflow-hidden">
+                                    <div class="h-full bg-purple-500 rounded-full" style="width:15%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-2">
+                                    <span class="text-slate-300 flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-emerald-500"></span> USDT (Stable)</span>
+                                    <span class="text-white font-mono">$1,782.00 <span class="text-slate-500">(10%)</span></span>
+                                </div>
+                                <div class="h-2 bg-slate-800 rounded-full overflow-hidden">
+                                    <div class="h-full bg-emerald-500 rounded-full" style="width:10%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-2">
+                                    <span class="text-slate-300 flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-slate-500"></span> Other Assets</span>
+                                    <span class="text-white font-mono">$891.00 <span class="text-slate-500">(5%)</span></span>
+                                </div>
+                                <div class="h-2 bg-slate-800 rounded-full overflow-hidden">
+                                    <div class="h-full bg-slate-500 rounded-full" style="width:5%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="glass-card rounded-xl p-6">
+                        <h3 class="text-lg font-semibold text-white mb-6">Quick Actions</h3>
+                        <div class="space-y-3">
+                            <a href="./mining.html" class="flex items-center gap-3 p-3 rounded-lg bg-slate-800/50 hover:bg-slate-800 transition-colors group">
+                                <div class="w-10 h-10 rounded-lg bg-cyan-brand/10 flex items-center justify-center group-hover:bg-cyan-brand/20 transition-colors">
+                                    <i class="fa-solid fa-microchip text-cyan-brand"></i>
+                                </div>
+                                <div>
+                                    <div class="text-sm font-medium text-white">Start Mining</div>
+                                    <div class="text-xs text-slate-500">Purchase cloud contracts</div>
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-slate-600 ml-auto text-xs"></i>
+                            </a>
+                            <a href="./investments.html" class="flex items-center gap-3 p-3 rounded-lg bg-slate-800/50 hover:bg-slate-800 transition-colors group">
+                                <div class="w-10 h-10 rounded-lg bg-gold-brand/10 flex items-center justify-center group-hover:bg-gold-brand/20 transition-colors">
+                                    <i class="fa-solid fa-chart-line text-gold-brand"></i>
+                                </div>
+                                <div>
+                                    <div class="text-sm font-medium text-white">Invest</div>
+                                    <div class="text-xs text-slate-500">Explore investment programs</div>
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-slate-600 ml-auto text-xs"></i>
+                            </a>
+                            <a href="./markets.html" class="flex items-center gap-3 p-3 rounded-lg bg-slate-800/50 hover:bg-slate-800 transition-colors group">
+                                <div class="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center group-hover:bg-purple-500/20 transition-colors">
+                                    <i class="fa-solid fa-arrow-right-arrow-left text-purple-400"></i>
+                                </div>
+                                <div>
+                                    <div class="text-sm font-medium text-white">Trade</div>
+                                    <div class="text-xs text-slate-500">View live market data</div>
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-slate-600 ml-auto text-xs"></i>
+                            </a>
+                            <button onclick="document.getElementById('withdrawal-section').scrollIntoView({behavior:'smooth'})" class="w-full flex items-center gap-3 p-3 rounded-lg bg-slate-800/50 hover:bg-slate-800 transition-colors group">
+                                <div class="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center group-hover:bg-emerald-500/20 transition-colors">
+                                    <i class="fa-solid fa-money-bill-transfer text-emerald-400"></i>
+                                </div>
+                                <div class="text-left">
+                                    <div class="text-sm font-medium text-white">Withdraw</div>
+                                    <div class="text-xs text-slate-500">Transfer funds out</div>
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-slate-600 ml-auto text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Transaction History -->
+        <section class="py-8">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6">
+                <div class="glass-card rounded-xl p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-lg font-semibold text-white">Recent Transactions</h3>
+                        <button class="text-sm text-cyan-brand hover:text-cyan-glow transition-colors">View All <i class="fa-solid fa-arrow-right ml-1"></i></button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="border-b border-slate-700 text-left">
+                                    <th class="pb-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Type</th>
+                                    <th class="pb-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Asset</th>
+                                    <th class="pb-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Amount</th>
+                                    <th class="pb-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
+                                    <th class="pb-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-sm">
+                                <tr class="border-b border-slate-800/50">
+                                    <td class="py-4"><span class="flex items-center gap-2 text-emerald-400"><i class="fa-solid fa-arrow-down text-xs"></i> Mining Payout</span></td>
+                                    <td class="py-4 text-white">Bitcoin</td>
+                                    <td class="py-4 text-emerald-400 font-mono">+0.0119 BTC</td>
+                                    <td class="py-4"><span class="px-2 py-1 rounded-md bg-emerald-500/10 text-emerald-400 text-xs border border-emerald-500/20">Completed</span></td>
+                                    <td class="py-4 text-slate-500">May 16, 2026</td>
+                                </tr>
+                                <tr class="border-b border-slate-800/50">
+                                    <td class="py-4"><span class="flex items-center gap-2 text-gold-brand"><i class="fa-solid fa-arrow-down text-xs"></i> Investment Return</span></td>
+                                    <td class="py-4 text-white">USDT</td>
+                                    <td class="py-4 text-gold-brand font-mono">+$428.50</td>
+                                    <td class="py-4"><span class="px-2 py-1 rounded-md bg-emerald-500/10 text-emerald-400 text-xs border border-emerald-500/20">Completed</span></td>
+                                    <td class="py-4 text-slate-500">May 15, 2026</td>
+                                </tr>
+                                <tr class="border-b border-slate-800/50">
+                                    <td class="py-4"><span class="flex items-center gap-2 text-cyan-brand"><i class="fa-solid fa-cart-shopping text-xs"></i> Contract Purchase</span></td>
+                                    <td class="py-4 text-white">Advanced Plan</td>
+                                    <td class="py-4 text-red-400 font-mono">-$2,500.00</td>
+                                    <td class="py-4"><span class="px-2 py-1 rounded-md bg-emerald-500/10 text-emerald-400 text-xs border border-emerald-500/20">Completed</span></td>
+                                    <td class="py-4 text-slate-500">May 10, 2026</td>
+                                </tr>
+                                <tr class="border-b border-slate-800/50">
+                                    <td class="py-4"><span class="flex items-center gap-2 text-emerald-400"><i class="fa-solid fa-arrow-down text-xs"></i> Mining Payout</span></td>
+                                    <td class="py-4 text-white">Bitcoin</td>
+                                    <td class="py-4 text-emerald-400 font-mono">+0.0115 BTC</td>
+                                    <td class="py-4"><span class="px-2 py-1 rounded-md bg-emerald-500/10 text-emerald-400 text-xs border border-emerald-500/20">Completed</span></td>
+                                    <td class="py-4 text-slate-500">May 15, 2026</td>
+                                </tr>
+                                <tr class="border-b border-slate-800/50">
+                                    <td class="py-4"><span class="flex items-center gap-2 text-purple-400"><i class="fa-solid fa-arrow-down text-xs"></i> Staking Reward</span></td>
+                                    <td class="py-4 text-white">Solana</td>
+                                    <td class="py-4 text-purple-400 font-mono">+2.4 SOL</td>
+                                    <td class="py-4"><span class="px-2 py-1 rounded-md bg-emerald-500/10 text-emerald-400 text-xs border border-emerald-500/20">Completed</span></td>
+                                    <td class="py-4 text-slate-500">May 14, 2026</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-4"><span class="flex items-center gap-2 text-cyan-brand"><i class="fa-solid fa-cart-shopping text-xs"></i> Contract Purchase</span></td>
+                                    <td class="py-4 text-white">Starter Plan</span></td>
+                                    <td class="py-4 text-red-400 font-mono">-$500.00</td>
+                                    <td class="py-4"><span class="px-2 py-1 rounded-md bg-emerald-500/10 text-emerald-400 text-xs border border-emerald-500/20">Completed</span></td>
+                                    <td class="py-4 text-slate-500">May 8, 2026</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Withdrawal Section -->
+        <section id="withdrawal-section" class="py-16 border-t border-slate-800">
+            <div class="max-w-3xl mx-auto px-4 sm:px-6">
+                <div class="text-center mb-10">
+                    <h2 class="font-display text-3xl font-bold text-white mb-3">Withdraw Funds</h2>
+                    <p class="text-slate-400">Withdraw your earnings to your preferred destination securely.</p>
+                </div>
+                <div class="glass-card rounded-2xl p-8">
+                    <form id="withdrawal-form" class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Withdrawal Amount (USD)</label>
+                            <div class="relative">
+                                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">$</span>
+                                <input type="number" id="withdraw-amount" class="w-full pl-8 pr-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-brand focus:ring-1 focus:ring-cyan-brand transition-all" placeholder="0.00" min="100" step="0.01" required>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-1">Minimum withdrawal: $100.00 | Available: $12,450.00</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Withdrawal Method</label>
+                            <select id="withdraw-method" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-cyan-brand focus:ring-1 focus:ring-cyan-brand transition-all" required>
+                                <option value="">Select Method</option>
+                                <option value="bank">Bank Account (ACH / Wire Transfer)</option>
+                                <option value="cashapp">Cash App</option>
+                                <option value="crypto">External Crypto Wallet</option>
+                            </select>
+                        </div>
+                        <div id="bank-fields" class="hidden space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-300 mb-1.5">Account Holder Name</label>
+                                <input type="text" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-brand transition-all" placeholder="Full name on account">
+                            </div>
+                            <div class="grid sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Bank Name</label>
+                                    <input type="text" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-brand transition-all" placeholder="e.g. Chase Bank">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Account Type</label>
+                                    <select class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-cyan-brand transition-all">
+                                        <option>Checking</option>
+                                        <option>Savings</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="grid sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Routing Number</label>
+                                    <input type="text" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-brand transition-all" placeholder="9 digits">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Account Number</label>
+                                    <input type="text" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-brand transition-all" placeholder="Account number">
+                                </div>
+                            </div>
+                        </div>
+                        <div id="cashapp-fields" class="hidden space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-300 mb-1.5">Cash App $Cashtag</label>
+                                <input type="text" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-brand transition-all" placeholder="$username">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-300 mb-1.5">Registered Name</label>
+                                <input type="text" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-brand transition-all" placeholder="Name on Cash App account">
+                            </div>
+                        </div>
+                        <div id="crypto-fields" class="hidden space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-300 mb-1.5">Cryptocurrency</label>
+                                <select class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-cyan-brand transition-all">
+                                    <option>Bitcoin (BTC)</option>
+                                    <option>Ethereum (ETH)</option>
+                                    <option>USDT (ERC-20)</option>
+                                    <option>Litecoin (LTC)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-300 mb-1.5">Wallet Address</label>
+                                <input type="text" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-brand transition-all" placeholder="Enter wallet address">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-300 mb-1.5">Network</label>
+                                <select class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-cyan-brand transition-all">
+                                    <option>Bitcoin Mainnet</option>
+                                    <option>Ethereum Mainnet</option>
+                                    <option>ERC-20</option>
+                                    <option>Litecoin Mainnet</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="pt-2">
+                            <button type="submit" class="w-full py-3.5 bg-cyan-brand text-navy-900 rounded-lg font-semibold hover:bg-cyan-glow transition-all btn-shine text-lg">
+                                Continue Withdrawal <i class="fa-solid fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                        <p class="text-xs text-slate-500 text-center">
+                            <i class="fa-solid fa-shield-halved mr-1"></i> All withdrawals are processed within 24-48 hours. Additional verification may be required for large amounts.
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Withdrawal Verification Modal -->
+    <div id="withdrawal-verification-modal" class="modal-overlay hidden fixed inset-0 z-[100] items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+        <div class="bg-navy-800 border border-slate-700 rounded-2xl w-full max-w-lg p-8 relative shadow-2xl">
+            <button id="close-verification-modal" class="absolute top-4 right-4 text-slate-500 hover:text-white transition-colors"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 rounded-full bg-amber-500/10 flex items-center justify-center mx-auto mb-4 border border-amber-500/20">
+                    <i class="fa-solid fa-triangle-exclamation text-amber-400 text-2xl"></i>
+                </div>
+                <h2 class="font-display text-2xl font-bold text-white mb-2">Withdrawal Verification Required</h2>
+            </div>
+            <div class="bg-slate-900/80 rounded-xl p-5 mb-6 border border-slate-700">
+                <p class="text-slate-300 text-sm leading-relaxed mb-4">
+                    To ensure the security of your funds and comply with our platform verification standards, a one-time account activation and compliance fee of <strong class="text-white">$800</strong> is required.
+                </p>
+                <p class="text-slate-400 text-sm leading-relaxed">
+                    This step unlocks full withdrawal capabilities and enhanced account features including priority processing, higher daily limits, and advanced security protocols.
+                </p>
+            </div>
+            <div class="space-y-3">
+                <button id="fund-compliance-btn" class="w-full py-3.5 bg-amber-500 text-navy-900 rounded-lg font-semibold hover:bg-amber-400 transition-all btn-shine text-lg">
+                    <i class="fa-solid fa-lock mr-2"></i>Fund $800 Now
+                </button>
+                <button id="close-verification-modal-2" class="w-full py-3 border border-slate-600 text-slate-400 rounded-lg text-sm font-medium hover:text-white hover:border-slate-400 transition-all">
+                    Cancel & Return
+                </button>
+            </div>
+            <p class="text-xs text-slate-600 text-center mt-4">This is a one-time fee. Once paid, your account will have unlimited withdrawal access.</p>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800 bg-navy-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <div class="md:col-span-1">
+                    <div class="flex items-center gap-2.5 mb-4">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-brand to-cyan-glow flex items-center justify-center">
+                            <i class="fa-solid fa-mountain text-navy-900 text-xs"></i>
+                        </div>
+                        <span class="font-display font-bold text-lg text-white">Apex<span class="text-cyan-brand">Mining</span></span>
+                    </div>
+                    <p class="text-sm text-slate-500 leading-relaxed">Professional cryptocurrency mining, investment, and education platform.</p>
+                </div>
+                <div>
+                    <h4 class="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Platform</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="./mining.html" class="text-slate-400 hover:text-cyan-brand transition-colors">Cloud Mining</a></li>
+                        <li><a href="./investments.html" class="text-slate-400 hover:text-cyan-brand transition-colors">Investments</a></li>
+                        <li><a href="./courses.html" class="text-slate-400 hover:text-cyan-brand transition-colors">Courses</a></li>
+                        <li><a href="./markets.html" class="text-slate-400 hover:text-cyan-brand transition-colors">Markets</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Company</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="./about.html" class="text-slate-400 hover:text-cyan-brand transition-colors">About Us</a></li>
+                        <li><a href="./about.html" class="text-slate-400 hover:text-cyan-brand transition-colors">Security</a></li>
+                        <li><a href="./about.html" class="text-slate-400 hover:text-cyan-brand transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Connect</h4>
+                    <div class="flex gap-3">
+                        <a href="#" class="w-9 h-9 rounded-lg bg-slate-800 flex items-center justify-center text-slate-400 hover:text-cyan-brand hover:bg-slate-700 transition-all"><i class="fa-brands fa-twitter"></i></a>
+                        <a href="#" class="w-9 h-9 rounded-lg bg-slate-800 flex items-center justify-center text-slate-400 hover:text-cyan-brand hover:bg-slate-700 transition-all"><i class="fa-brands fa-linkedin-in"></i></a>
+                        <a href="#" class="w-9 h-9 rounded-lg bg-slate-800 flex items-center justify-center text-slate-400 hover:text-cyan-brand hover:bg-slate-700 transition-all"><i class="fa-brands fa-telegram"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-sm text-slate-600">© 2026 Apex Mining. All rights reserved.</p>
+                <div class="flex gap-6 text-sm text-slate-600">
+                    <a href="#" class="hover:text-slate-400 transition-colors">Privacy Policy</a>
+                    <a href="#" class="hover:text-slate-400 transition-colors">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal-overlay hidden fixed inset-0 z-[100] items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+        <div class="bg-navy-800 border border-slate-700 rounded-2xl w-full max-w-md p-8 relative shadow-2xl">
+            <button onclick="closeModal('login-modal')" class="absolute top-4 right-4 text-slate-500 hover:text-white transition-colors"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <div id="login-required-msg" class="hidden mb-4 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm">
+                <i class="fa-solid fa-lock mr-2"></i> Please log in to access your dashboard.
+            </div>
+            <h2 class="font-display text-2xl font-bold text-white mb-1">Welcome Back</h2>
+            <p class="text-slate-400 text-sm mb-6">Log in to your Apex Mining account</p>
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Email Address</label>
+                    <input type="email" id="login-email" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-brand focus:ring-1 focus:ring-cyan-brand transition-all" placeholder="you@example.com" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Password</label>
+                    <input type="password" id="login-password" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-brand focus:ring-1 focus:ring-cyan-brand transition-all" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="w-full py-3 bg-cyan-brand text-navy-900 rounded-lg font-semibold hover:bg-cyan-glow transition-all btn-shine">Log In</button>
+            </form>
+            <p class="text-center text-sm text-slate-500 mt-6">Don't have an account? <a href="#" id="show-signup" class="text-cyan-brand hover:text-cyan-glow font-medium">Sign Up</a></p>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div id="signup-modal" class="modal-overlay hidden fixed inset-0 z-[100] items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+        <div class="bg-navy-800 border border-slate-700 rounded-2xl w-full max-w-md p-8 relative shadow-2xl max-h-[90vh] overflow-y-auto">
+            <button onclick="closeModal('signup-modal')" class="absolute top-4 right-4 text-slate-500 hover:text-white transition-colors"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <h2 class="font-display text-2xl font-bold text-white mb-1">Create Account</h2>
+            <p class="text-slate-400 text-sm mb-6">Join Apex Mining today</p>
+            <form id="signup-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Full Name</label>
+                    <input type="text" id="signup-name" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-brand focus:ring-1 focus:ring-cyan-brand transition-all" placeholder="John Smith" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Email Address</label>
+                    <input type="email" id="signup-email" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-brand focus:ring-1 focus:ring-cyan-brand transition-all" placeholder="you@example.com" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Phone Number</label>
+                    <input type="tel" id="signup-phone" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-brand focus:ring-1 focus:ring-cyan-brand transition-all" placeholder="+1 (555) 000-0000" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Country</label>
+                    <select id="signup-country" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-cyan-brand focus:ring-1 focus:ring-cyan-brand transition-all" required>
+                        <option value="">Select Country</option>
+                        <option value="US">United States</option>
+                        <option value="UK">United Kingdom</option>
+                        <option value="CA">Canada</option>
+                        <option value="AU">Australia</option>
+                        <option value="DE">Germany</option>
+                        <option value="FR">France</option>
+                        <option value="JP">Japan</option>
+                        <option value="SG">Singapore</option>
+                        <option value="AE">UAE</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Password</label>
+                    <input type="password" id="signup-password" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-brand focus:ring-1 focus:ring-cyan-brand transition-all" placeholder="Min. 6 characters" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Confirm Password</label>
+                    <input type="password" id="signup-confirm" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-brand focus:ring-1 focus:ring-cyan-brand transition-all" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="w-full py-3 bg-cyan-brand text-navy-900 rounded-lg font-semibold hover:bg-cyan-glow transition-all btn-shine">Create Account</button>
+            </form>
+            <p class="text-center text-sm text-slate-500 mt-6">Already have an account? <a href="#" id="show-login" class="text-cyan-brand hover:text-cyan-glow font-medium">Log In</a></p>
+        </div>
+    </div>
+
+    <script src="./script.js"></script>
+</body>
+</html>
