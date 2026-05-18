@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Withdrawal Method - Apex Mining</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: { 900: '#0a0e1a', 800: '#111827', 700: '#1e293b' },
+                        cyan: { 400: '#22d3ee', 500: '#06b6d4' },
+                        gold: { 400: '#fbbf24', 500: '#f59e0b' }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #0a0e1a 0%, #111827 50%, #0a0e1a 100%);
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            color: #e2e8f0;
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+        }
+        .method-card {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .method-card:hover {
+            border-color: rgba(6, 182, 212, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 40px rgba(6, 182, 212, 0.15);
+        }
+        .method-card.selected {
+            border-color: #06b6d4;
+            background: rgba(6, 182, 212, 0.1);
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.2);
+        }
+        .method-card.selected::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            color: #06b6d4;
+            font-size: 18px;
+        }
+        .method-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 16px;
+        }
+        .icon-cashapp { background: linear-gradient(135deg, #00d632 0%, #00b828 100%); color: white; }
+        .icon-bank { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; }
+        .icon-wallet { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; }
+        .btn-primary {
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            color: white;
+            font-weight: 600;
+            padding: 14px 32px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            width: 100%;
+        }
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(6, 182, 212, 0.4);
+        }
+        .btn-primary:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        .btn-back {
+            background: rgba(255, 255, 255, 0.05);
+            color: #94a3b8;
+            font-weight: 500;
+            padding: 14px 32px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            width: 100%;
+        }
+        .btn-back:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+        }
+        .input-field {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 14px 16px;
+            color: #e2e8f0;
+            font-size: 15px;
+            width: 100%;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+        .input-field:focus {
+            border-color: #06b6d4;
+            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15);
+        }
+        .input-field::placeholder { color: #64748b; }
+        .tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .tag-fast { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+        .tag-standard { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+        .tag-crypto { background: rgba(139, 92, 246, 0.15); color: #8b5cf6; }
+        .amount-display {
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(245, 158, 11, 0.1) 100%);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        .shimmer {
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .hidden-field { display: none; }
+        .hidden-field.show { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen flex items-center justify-center p-4">
+        <div class="w-full max-w-2xl">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-cyan-400/10 border border-cyan-500/20 mb-4">
+                    <i class="fas fa-wallet text-2xl text-cyan-400"></i>
+                </div>
+                <h1 class="font-display text-3xl font-bold text-white mb-2">Withdraw Funds</h1>
+                <p class="text-slate-400">Choose your preferred withdrawal method</p>
+            </div>
+
+            <!-- Amount Display -->
+            <div class="amount-display mb-6">
+                <p class="text-sm text-slate-400 mb-1">Available Balance</p>
+                <p class="font-display text-3xl font-bold text-white" id="display-balance">$0.00</p>
+                <p class="text-sm text-cyan-400 mt-1" id="display-crypto">0.00000000 BTC</p>
+            </div>
+
+            <!-- Withdrawal Methods -->
+            <div class="glass-card p-6 mb-6">
+                <h2 class="font-display text-lg font-semibold text-white mb-4">Select Method</h2>
+                
+                <div class="space-y-4" id="method-list">
+                    <!-- Cash App -->
+                    <div class="method-card p-5" onclick="selectMethod('cashapp')" id="method-cashapp">
+                        <div class="flex items-start gap-4">
+                            <div class="method-icon icon-cashapp">
+                                <i class="fab fa-bitcoin"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h3 class="font-semibold text-white text-lg">Cash App</h3>
+                                    <span class="tag tag-fast">Instant</span>
+                                </div>
+                                <p class="text-sm text-slate-400 mb-2">Withdraw directly to your Cash App account using your $Cashtag</p>
+                                <div class="flex items-center gap-4 text-xs text-slate-500">
+                                    <span><i class="fas fa-bolt text-green-400 mr-1"></i> Instant delivery</span>
+                                    <span><i class="fas fa-percentage text-slate-400 mr-1"></i> 1.5% fee</span>
+                                    <span><i class="fas fa-dollar-sign text-slate-400 mr-1"></i> Min $10</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Cash App Detail Fields -->
+                        <div class="hidden-field mt-4 pt-4 border-t border-slate-700/50" id="fields-cashapp">
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Cash App $Cashtag</label>
+                            <div class="relative">
+                                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold">$</span>
+                                <input type="text" class="input-field pl-8" id="cashapp-tag" placeholder="Enter your $Cashtag (e.g., johnsmith)" oninput="validateForm()">
+                            </div>
+                            <p class="text-xs text-slate-500 mt-2"><i class="fas fa-info-circle mr-1"></i> Funds will be sent to this Cash App account</p>
+                        </div>
+                    </div>
+
+                    <!-- Bank / ACH Transfer -->
+                    <div class="method-card p-5" onclick="selectMethod('bank')" id="method-bank">
+                        <div class="flex items-start gap-4">
+                            <div class="method-icon icon-bank">
+                                <i class="fas fa-university"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h3 class="font-semibold text-white text-lg">Bank Transfer (ACH)</h3>
+                                    <span class="tag tag-standard">1-3 Days</span>
+                                </div>
+                                <p class="text-sm text-slate-400 mb-2">Direct deposit to your linked bank account via ACH transfer</p>
+                                <div class="flex items-center gap-4 text-xs text-slate-500">
+                                    <span><i class="fas fa-clock text-amber-400 mr-1"></i> 1-3 business days</span>
+                                    <span><i class="fas fa-percentage text-slate-400 mr-1"></i> $0 fee</span>
+                                    <span><i class="fas fa-dollar-sign text-slate-400 mr-1"></i> Min $25</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Bank Detail Fields -->
+                        <div class="hidden-field mt-4 pt-4 border-t border-slate-700/50" id="fields-bank">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-300 mb-2">Account Holder Name</label>
+                                    <input type="text" class="input-field" id="bank-name" placeholder="Full name on account" oninput="validateForm()">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-300 mb-2">Bank Name</label>
+                                    <input type="text" class="input-field" id="bank-bankname" placeholder="e.g. Chase, Bank of America" oninput="validateForm()">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-300 mb-2">Account Number</label>
+                                    <input type="text" class="input-field" id="bank-account" placeholder="Enter account number" oninput="validateForm()">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-300 mb-2">Routing Number</label>
+                                    <input type="text" class="input-field" id="bank-routing" placeholder="Enter routing number" oninput="validateForm()">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-300 mb-2">Account Type</label>
+                                <select class="input-field" id="bank-type" onchange="validateForm()">
+                                    <option value="">Select account type</option>
+                                    <option value="checking">Checking Account</option>
+                                    <option value="savings">Savings Account</option>
+                                </select>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-3"><i class="fas fa-shield-alt mr-1"></i> Your banking information is encrypted and secure</p>
+                        </div>
+                    </div>
+
+                    <!-- External Crypto Wallet -->
+                    <div class="method-card p-5" onclick="selectMethod('wallet')" id="method-wallet">
+                        <div class="flex items-start gap-4">
+                            <div class="method-icon icon-wallet">
+                                <i class="fas fa-cube"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h3 class="font-semibold text-white text-lg">External Crypto Wallet</h3>
+                                    <span class="tag tag-crypto">Blockchain</span>
+                                </div>
+                                <p class="text-sm text-slate-400 mb-2">Send crypto directly to any external wallet address</p>
+                                <div class="flex items-center gap-4 text-xs text-slate-500">
+                                    <span><i class="fas fa-bolt text-green-400 mr-1"></i> Network dependent</span>
+                                    <span><i class="fas fa-percentage text-slate-400 mr-1"></i> Network fee only</span>
+                                    <span><i class="fas fa-dollar-sign text-slate-400 mr-1"></i> Min $50</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Wallet Detail Fields -->
+                        <div class="hidden-field mt-4 pt-4 border-t border-slate-700/50" id="fields-wallet">
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-slate-300 mb-2">Cryptocurrency</label>
+                                <select class="input-field" id="wallet-crypto" onchange="validateForm()">
+                                    <option value="">Select cryptocurrency</option>
+                                    <option value="BTC">Bitcoin (BTC)</option>
+                                    <option value="ETH">Ethereum (ETH)</option>
+                                    <option value="USDT">Tether (USDT - ERC20)</option>
+                                    <option value="USDT_TRC">Tether (USDT - TRC20)</option>
+                                    <option value="SOL">Solana (SOL)</option>
+                                    <option value="LTC">Litecoin (LTC)</option>
+                                </select>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-slate-300 mb-2">Wallet Address</label>
+                                <input type="text" class="input-field font-mono text-sm" id="wallet-address" placeholder="Enter wallet address" oninput="validateForm()">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-300 mb-2">Network / Chain</label>
+                                <select class="input-field" id="wallet-network" onchange="validateForm()">
+                                    <option value="">Select network</option>
+                                    <option value="bitcoin">Bitcoin Network</option>
+                                    <option value="ethereum">Ethereum (ERC20)</option>
+                                    <option value="tron">Tron (TRC20)</option>
+                                    <option value="solana">Solana Network</option>
+                                    <option value="litecoin">Litecoin Network</option>
+                                </select>
+                            </div>
+                            <div class="mt-3 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+                                <p class="text-xs text-red-400"><i class="fas fa-exclamation-triangle mr-1"></i> <strong>Warning:</strong> Double-check your wallet address. Transactions to incorrect addresses cannot be recovered.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Amount Input -->
+            <div class="glass-card p-6 mb-6">
+                <h2 class="font-display text-lg font-semibold text-white mb-4">Withdrawal Amount</h2>
+                <div class="relative mb-3">
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-lg font-bold">$</span>
+                    <input type="number" class="input-field pl-10 text-xl font-semibold" id="withdraw-amount" placeholder="0.00" step="0.01" min="0" oninput="validateForm(); updateAmount()">
+                </div>
+                <div class="flex items-center justify-between text-sm">
+                    <span class="text-slate-500">Min: <span class="text-slate-300" id="min-amount">$10.00</span></span>
+                    <button class="text-cyan-400 hover:text-cyan-300 font-medium text-sm" onclick="setMaxAmount()">Withdraw All</button>
+                </div>
+                <div id="amount-error" class="text-red-400 text-sm mt-2 hidden"><i class="fas fa-exclamation-circle mr-1"></i> <span id="error-text"></span></div>
+            </div>
+
+            <!-- Summary Preview -->
+            <div class="glass-card p-6 mb-6" id="summary-card" style="display: none;">
+                <h2 class="font-display text-lg font-semibold text-white mb-4">Withdrawal Summary</h2>
+                <div class="space-y-3 text-sm">
+                    <div class="flex justify-between">
+                        <span class="text-slate-400">Withdrawal Amount</span>
+                        <span class="text-white font-semibold" id="summary-amount">$0.00</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-400">Processing Fee</span>
+                        <span class="text-slate-300" id="summary-fee">$0.00</span>
+                    </div>
+                    <div class="border-t border-slate-700/50 pt-3 flex justify-between">
+                        <span class="text-slate-300 font-medium">You Receive</span>
+                        <span class="text-cyan-400 font-bold text-lg" id="summary-receive">$0.00</span>
+                    </div>
+                    <div class="flex justify-between text-xs">
+                        <span class="text-slate-500">Destination</span>
+                        <span class="text-slate-400" id="summary-destination">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <button class="btn-back" onclick="goBack()">
+                    <i class="fas fa-arrow-left mr-2"></i> Back to Dashboard
+                </button>
+                <button class="btn-primary" id="btn-continue" onclick="proceedToFee()" disabled>
+                    Continue <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let selectedMethod = null;
+        let balance = 0;
+        let balanceCrypto = 0;
+        let cryptoType = 'BTC';
+
+        // Fee structure
+        const fees = {
+            cashapp: 0.015,      // 1.5%
+            bank: 0,             // $0
+            wallet: 0            // network fee handled separately
+        };
+
+        const minAmounts = {
+            cashapp: 10,
+            bank: 25,
+            wallet: 50
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadBalance();
+        });
+
+        function loadBalance() {
+            try {
+                const state = JSON.parse(localStorage.getItem('apex_state') || '{}');
+                balance = state.balance || 17820.00;
+                balanceCrypto = state.balanceCrypto || 0.5234;
+                cryptoType = state.cryptoType || 'BTC';
+                
+                document.getElementById('display-balance').textContent = '$' + formatMoney(balance);
+                document.getElementById('display-crypto').textContent = balanceCrypto.toFixed(8) + ' ' + cryptoType;
+            } catch(e) {
+                console.error('Error loading balance:', e);
+            }
+        }
+
+        function formatMoney(amount) {
+            return amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function selectMethod(method) {
+            // Remove previous selection
+            document.querySelectorAll('.method-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            document.querySelectorAll('.hidden-field').forEach(field => {
+                field.classList.remove('show');
+            });
+
+            // Add selection to clicked method
+            selectedMethod = method;
+            document.getElementById('method-' + method).classList.add('selected');
+            document.getElementById('fields-' + method).classList.add('show');
+
+            // Update min amount display
+            document.getElementById('min-amount').textContent = '$' + minAmounts[method].toFixed(2);
+
+            validateForm();
+        }
+
+        function setMaxAmount() {
+            if (selectedMethod) {
+                const fee = fees[selectedMethod];
+                const maxWithdraw = fee > 0 ? balance / (1 + fee) : balance;
+                document.getElementById('withdraw-amount').value = maxWithdraw.toFixed(2);
+                validateForm();
+                updateAmount();
+            } else {
+                showError('Please select a withdrawal method first');
+            }
+        }
+
+        function updateAmount() {
+            const amount = parseFloat(document.getElementById('withdraw-amount').value) || 0;
+            const fee = selectedMethod ? (amount * fees[selectedMethod]) : 0;
+            const receive = amount - fee;
+
+            if (selectedMethod && amount > 0) {
+                document.getElementById('summary-card').style.display = 'block';
+                document.getElementById('summary-amount').textContent = '$' + formatMoney(amount);
+                document.getElementById('summary-fee').textContent = selectedMethod === 'bank' ? 'FREE' : '$' + formatMoney(fee);
+                document.getElementById('summary-receive').textContent = '$' + formatMoney(receive);
+                
+                // Update destination preview
+                let destText = '-';
+                if (selectedMethod === 'cashapp') {
+                    const tag = document.getElementById('cashapp-tag').value;
+                    destText = tag ? '$' + tag : 'Cash App';
+                } else if (selectedMethod === 'bank') {
+                    const bankName = document.getElementById('bank-bankname').value;
+                    destText = bankName || 'Bank Account';
+                } else if (selectedMethod === 'wallet') {
+                    const crypto = document.getElementById('wallet-crypto').value;
+                    const addr = document.getElementById('wallet-address').value;
+                    destText = crypto ? (crypto + ' Wallet' + (addr ? ': ' + addr.substring(0, 8) + '...' : '')) : 'External Wallet';
+                }
+                document.getElementById('summary-destination').textContent = destText;
+            } else {
+                document.getElementById('summary-card').style.display = 'none';
+            }
+        }
+
+        function validateForm() {
+            const amount = parseFloat(document.getElementById('withdraw-amount').value) || 0;
+            let isValid = true;
+            let errorMsg = '';
+
+            // Check method selected
+            if (!selectedMethod) {
+                isValid = false;
+            }
+
+            // Check amount
+            if (amount <= 0) {
+                isValid = false;
+            } else if (selectedMethod && amount < minAmounts[selectedMethod]) {
+                isValid = false;
+                errorMsg = 'Minimum withdrawal is $' + minAmounts[selectedMethod].toFixed(2);
+            } else if (amount > balance) {
+                isValid = false;
+                errorMsg = 'Insufficient balance. Max: $' + formatMoney(balance);
+            }
+
+            // Check method-specific fields
+            if (selectedMethod === 'cashapp') {
+                const tag = document.getElementById('cashapp-tag').value.trim();
+                if (!tag) isValid = false;
+            } else if (selectedMethod === 'bank') {
+                const name = document.getElementById('bank-name').value.trim();
+                const bankName = document.getElementById('bank-bankname').value.trim();
+                const account = document.getElementById('bank-account').value.trim();
+                const routing = document.getElementById('bank-routing').value.trim();
+                const type = document.getElementById('bank-type').value;
+                if (!name || !bankName || !account || !routing || !type) isValid = false;
+            } else if (selectedMethod === 'wallet') {
+                const crypto = document.getElementById('wallet-crypto').value;
+                const address = document.getElementById('wallet-address').value.trim();
+                const network = document.getElementById('wallet-network').value;
+                if (!crypto || !address || !network) isValid = false;
+            }
+
+            // Update error display
+            const errorEl = document.getElementById('amount-error');
+            if (errorMsg && amount > 0) {
+                errorEl.classList.remove('hidden');
+                document.getElementById('error-text').textContent = errorMsg;
+            } else {
+                errorEl.classList.add('hidden');
+            }
+
+            // Enable/disable button
+            document.getElementById('btn-continue').disabled = !isValid;
+
+            // Update summary
+            if (isValid) updateAmount();
+        }
+
+        function showError(msg) {
+            const errorEl = document.getElementById('amount-error');
+            errorEl.classList.remove('hidden');
+            document.getElementById('error-text').textContent = msg;
+            setTimeout(() => errorEl.classList.add('hidden'), 3000);
+        }
+
+        function proceedToFee() {
+            const amount = parseFloat(document.getElementById('withdraw-amount').value) || 0;
+            
+            // Collect destination details
+            let destination = {};
+            if (selectedMethod === 'cashapp') {
+                destination = {
+                    type: 'cashapp',
+                    cashtag: document.getElementById('cashapp-tag').value.trim()
+                };
+            } else if (selectedMethod === 'bank') {
+                destination = {
+                    type: 'bank',
+                    accountName: document.getElementById('bank-name').value.trim(),
+                    bankName: document.getElementById('bank-bankname').value.trim(),
+                    accountNumber: document.getElementById('bank-account').value.trim(),
+                    routingNumber: document.getElementById('bank-routing').value.trim(),
+                    accountType: document.getElementById('bank-type').value
+                };
+            } else if (selectedMethod === 'wallet') {
+                destination = {
+                    type: 'wallet',
+                    crypto: document.getElementById('wallet-crypto').value,
+                    address: document.getElementById('wallet-address').value.trim(),
+                    network: document.getElementById('wallet-network').value
+                };
+            }
+
+            // Save to localStorage for payment/fee page
+            const withdrawalData = {
+                amount: amount,
+                method: selectedMethod,
+                destination: destination,
+                fee: fees[selectedMethod] * amount,
+                receive: amount - (fees[selectedMethod] * amount),
+                timestamp: new Date().toISOString()
+            };
+
+            try {
+                localStorage.setItem('apex_withdrawal_data', JSON.stringify(withdrawalData));
+            } catch(e) {
+                console.error('Storage error:', e);
+            }
+
+            // Redirect to compliance fee page
+            window.location.href = 'payment.html?type=withdrawal&fee=800';
+        }
+
+        function goBack() {
+            window.location.href = 'dashboard.html';
+        }
+    </script>
+</body>
+</html>
