@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About — Apex Mining</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter','sans-serif'], display: ['Space Grotesk','sans-serif'] },
+                    colors: { navy: {900:'#0a0e1a',800:'#0f172a',700:'#1e293b'}, cyan: {brand:'#06b6d4',glow:'#22d3ee'}, gold: {brand:'#f59e0b',glow:'#fbbf24'} }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #0a0e1a; }
+        .gradient-text { background: linear-gradient(135deg, #22d3ee, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .glass-card { background: rgba(15,23,42,0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); }
+        .btn-shine { position: relative; overflow: hidden; }
+        .btn-shine::after { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transition: left 0.5s; }
+        .btn-shine:hover::after { left: 100%; }
+        .hover-lift { transition: transform 0.3s, box-shadow 0.3s; }
+        .hover-lift:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+        .shimmer { background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    </style>
+</head>
+<body class="text-slate-300 min-h-screen">
+
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-navy-900/90 backdrop-blur-xl border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            <div class="py-1.5 border-b border-slate-800/50 overflow-hidden">
+                <div id="header-ticker" class="text-xs text-slate-400 flex items-center gap-4 whitespace-nowrap">
+                    <span class="shimmer inline-block w-64 h-4 rounded"></span>
+                </div>
+            </div>
+            <div class="flex items-center justify-between h-16">
+                <a href="./index.html" class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-brand to-cyan-glow flex items-center justify-center">
+                        <i class="fa-solid fa-mountain text-navy-900 text-sm"></i>
+                    </div>
+                    <span class="font-display font-bold text-xl text-white tracking-tight">Apex<span class="text-cyan-brand">Mining</span></span>
+                </a>
+                <nav class="hidden md:flex items-center gap-1">
+                    <a href="./index.html" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40 transition-all">Home</a>
+                    <a href="./mining.html" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40 transition-all">Mining</a>
+                    <a href="./courses.html" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40 transition-all">Courses</a>
+                    <a href="./investments.html" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40 transition-all">Investments</a>
+                    <a href="./dashboard.html" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40 transition-all">Dashboard</a>
+                    <a href="./markets.html" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40 transition-all">Markets</a>
+                    <a href="./about.html" class="px-3 py-2 rounded-lg text-sm font-medium text-white bg-slate-800/60">About</a>
+                </nav>
+                <div class="flex items-center gap-3">
+                    <div id="auth-buttons" class="hidden md:flex items-center gap-2">
+                        <button onclick="openModal('login-modal')" class="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white transition-colors">Log In</button>
+                        <button onclick="openModal('signup-modal')" class="px-4 py-2 text-sm font-medium bg-cyan-brand text-navy-900 rounded-lg hover:bg-cyan-glow transition-colors btn-shine font-semibold">Sign Up</button>
+                    </div>
+                    <div id="user-menu" class="hidden md:flex items-center gap-3">
+                        <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800/60 border border-slate-700">
+                            <div class="w-7 h-7 rounded-full bg-gradient-to-br from-cyan-brand to-cyan-glow flex items-center justify-center text-navy-900 text-xs font-bold"><i class="fa-solid fa-user"></i></div>
+                            <span id="user-name-display" class="text-sm font-medium text-white">User</span>
+                        </div>
+                        <button id="logout-btn" class="text-slate-400 hover:text-red-400 transition-colors text-sm"><i class="fa-solid fa-right-from-bracket"></i></button>
+                    </div>
+                    <button id="mobile-menu-toggle" class="md:hidden p-2 text-slate-400 hover:text-white"><i class="fa-solid fa-bars text-lg"></i></button>
+                </div>
+            </div>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden bg-navy-900 border-t border-slate-800">
+            <div class="px-4 py-3 space-y-1">
+                <a href="./index.html" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40">Home</a>
+                <a href="./mining.html" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40">Mining</a>
+                <a href="./courses.html" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40">Courses</a>
+                <a href="./investments.html" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40">Investments</a>
+                <a href="./dashboard.html" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40">Dashboard</a>
+                <a href="./markets.html" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40">Markets</a>
+                <a href="./about.html" class="block px-3 py-2 rounded-lg text-sm font-medium text-white bg-slate-800">About</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="pt-[104px]">
+        <!-- Hero -->
+        <section class="py-16 border-b border-slate-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 text-center">
+                <h1 class="font-display text-3xl sm:text-5xl font-bold text-white mb-6">Building the Future of <span class="gradient-text">Digital Finance</span></h1>
+                <p class="text-slate-400 max-w-3xl mx-auto text-lg leading-relaxed">Founded in 2019, Apex Mining has grown from a small mining operation to a global leader in cryptocurrency infrastructure, investment management, and blockchain education.</p>
+            </div>
+        </section>
+
+        <!-- Stats -->
+        <section class="py-12 border-b border-slate-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6">
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="glass-card rounded-xl p-6 text-center">
+                        <div class="text-3xl font-bold text-cyan-brand mb-1">12</div>
+                        <div class="text-sm text-slate-500">Global Data Centers</div>
+                    </div>
+                    <div class="glass-card rounded-xl p-6 text-center">
+                        <div class="text-3xl font-bold text-cyan-brand mb-1">150+</div>
+                        <div class="text-sm text-slate-500">Team Members</div>
+                    </div>
+                    <div class="glass-card rounded-xl p-6 text-center">
+                        <div class="text-3xl font-bold text-cyan-brand mb-1">50K+</div>
+                        <div class="text-sm text-slate-500">Active Miners</div>
+                    </div>
+                    <div class="glass-card rounded-xl p-6 text-center">
+                        <div class="text-3xl font-bold text-cyan-brand mb-1">$2.4B</div>
+                        <div class="text-sm text-slate-500">Assets Under Management</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Certifications -->
+        <section class="py-16 border-b border-slate-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6">
+                <div class="text-center mb-10">
+                    <h2 class="font-display text-2xl sm:text-3xl font-bold text-white mb-3">Certifications & Compliance</h2>
+                    <p class="text-slate-400">Meeting the highest standards in security and regulatory compliance</p>
+                </div>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="glass-card rounded-xl p-6 text-center hover-lift">
+                        <div class="w-14 h-14 rounded-full bg-cyan-brand/10 flex items-center justify-center mx-auto mb-4 border border-cyan-brand/20">
+                            <i class="fa-solid fa-shield-halved text-cyan-brand text-xl"></i>
+                        </div>
+                        <h3 class="font-semibold text-white mb-1">SOC 2 Type II</h3>
+                        <p class="text-sm text-slate-500">Certified security controls and data protection</p>
+                    </div>
+                    <div class="glass-card rounded-xl p-6 text-center hover-lift">
+                        <div class="w-14 h-14 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto mb-4 border border-emerald-500/20">
+                            <i class="fa-solid fa-leaf text-emerald-400 text-xl"></i>
+                        </div>
+                        <h3 class="font-semibold text-white mb-1">78% Green Energy</h3>
+                        <p class="text-sm text-slate-500">Sustainable mining operations worldwide</p>
+                    </div>
+                    <div class="glass-card rounded-xl p-6 text-center hover-lift">
+                        <div class="w-14 h-14 rounded-full bg-gold-brand/10 flex items-center justify-center mx-auto mb-4 border border-gold-brand/20">
+                            <i class="fa-solid fa-globe text-gold-brand text-xl"></i>
+                        </div>
+                        <h3 class="font-semibold text-white mb-1">Global Presence</h3>
+                        <p class="text-sm text-slate-500">Operating in 15+ countries across 4 continents</p>
+                    </div>
+                    <div class="glass-card rounded-xl p-6 text-center hover-lift">
+                        <div class="w-14 h-14 rounded-full bg-purple-500/10 flex items-center justify-center mx-auto mb-4 border border-purple-500/20">
+                            <i class="fa-solid fa-award text-purple-400 text-xl"></i>
+                        </div>
+                        <h3 class="font-semibold text-white mb-1">Award Winning</h3>
+                        <p class="text-sm text-slate-500">Best Crypto Platform 2024 & 2025</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Leadership -->
+        <section class="py-16 border-b border-slate-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6">
+                <div class="text-center mb-10">
+                    <h2 class="font-display text-2xl sm:text-3xl font-bold text-white mb-3">Leadership Team</h2>
+                    <p class="text-slate-400">Industry veterans driving innovation in digital assets</p>
+                </div>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="glass-card rounded-xl p-6 text-center hover-lift">
+                        <div class="w-20 h-20 rounded-full bg-gradient-to-br from-cyan-brand to-cyan-glow flex items-center justify-center mx-auto mb-4 text-navy-900 text-2xl font-bold">JC</div>
+                        <h3 class="font-semibold text-white">James Chen</h3>
+                        <p class="text-sm text-cyan-brand mb-2">Chief Executive Officer</p>
+                        <p class="text-sm text-slate-500">Former Goldman Sachs VP, 15 years in fintech</p>
+                    </div>
+                    <div class="glass-card rounded-xl p-6 text-center hover-lift">
+                        <div class="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center mx-auto mb-4 text-white text-2xl font-bold">SW</div>
+                        <h3 class="font-semibold text-white">Sarah Williams</h3>
+                        <p class="text-sm text-purple-400 mb-2">Chief Investment Officer</p>
+                        <p class="text-sm text-slate-500">Former BlackRock portfolio manager</p>
+                    </div>
+                    <div class="glass-card rounded-xl p-6 text-center hover-lift">
+                        <div class="w-20 h-20 rounded-full bg-gradient-to-br from-gold-brand to-gold-glow flex items-center justify-center mx-auto mb-4 text-navy-900 text-2xl font-bold">MR</div>
+                        <h3 class="font-semibold text-white">Michael Rodriguez</h3>
+                        <p class="text-sm text-gold-brand mb-2">Chief Technology Officer</p>
+                        <p class="text-sm text-slate-500">Ex-Google engineer, blockchain architect</p>
+                    </div>
+                    <div class="glass-card rounded-xl p-6 text-center hover-lift">
+                        <div class="w-20 h-20 rounded-full bg-gradient-to-br from-rose-500 to-rose-600 flex items-center justify-center mx-auto mb-4 text-white text-2xl font-bold">EV</div>
+                        <h3 class="font-semibold text-white">Elena Volkov</h3>
+                        <p class="text-sm text-rose-400 mb-2">Chief Compliance Officer</p>
+                        <p class="text-sm text-slate-500">Former SEC regulator, compliance expert</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Partners -->
+        <section class="py-16 border-b border-slate-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6">
+                <div class="text-center mb-10">
+                    <h2 class="font-display text-2xl sm:text-3xl font-bold text-white mb-3">Strategic Partners</h2>
+                    <p class="text-slate-400">Trusted by industry leaders worldwide</p>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-6">
+                    <div class="glass-card rounded-xl p-6 flex items-center justify-center h-20">
+                        <span class="text-slate-400 font-semibold">AWS</span>
+                    </div>
+                    <div class="glass-card rounded-xl p-6 flex items-center justify-center h-20">
+                        <span class="text-slate-400 font-semibold">Google Cloud</span>
+                    </div>
+                    <div class="glass-card rounded-xl p-6 flex items-center justify-center h-20">
+                        <span class="text-slate-400 font-semibold">Chainalysis</span>
+                    </div>
+                    <div class="glass-card rounded-xl p-6 flex items-center justify-center h-20">
+                        <span class="text-slate-400 font-semibold">Fireblocks</span>
+                    </div>
+                    <div class="glass-card rounded-xl p-6 flex items-center justify-center h-20">
+                        <span class="text-slate-400 font-semibold">Silvergate</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact CTA -->
+ Continuing from where I left off. Here's the rest of **`investments.html`**:
+
+```html
+                            <h3 class="text-lg font-semibold text-white mb-2">Liquidity Mining Ultra</h3>
+                            <p class="text-sm text-slate-400 mb-4 leading-relaxed">High-frequency liquidity provision across DEXs with auto-compounding rewards and advanced hedging strategies.</p>
+                            <div class="grid grid-cols-2 gap-3 mb-4">
+                                <div class="bg-slate-800/50 rounded-lg p-3">
+                                    <div class="text-xs text-slate-500 mb-1">Min Investment</div>
+                                    <div class="text-sm font-semibold text-white">$10,000</div>
+                                </div>
+                                <div class="bg-slate-800/50 rounded-lg p-3">
+                                    <div class="text-xs text-slate-500 mb-1">Return (APR)</div>
+                                    <div class="text-sm font-semibold text-emerald-400">80% - 250%</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between pt-4 border-t border-slate-700">
+                                <div class="text-xs text-slate-500"><i class="fa-regular fa-clock mr-1"></i>3 Months</div>
+                                <button class="px-4 py-2 bg-cyan-brand text-navy-900 rounded-lg text-sm font-semibold hover:bg-cyan-glow transition-all">Invest Now</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Risk Disclaimer -->
+        <section class="py-8 border-t border-slate-800">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6">
+                <div class="glass-card rounded-xl p-6 border-l-4 border-gold-brand">
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-lg bg-gold-brand/10 flex items-center justify-center flex-shrink-0">
+                            <i class="fa-solid fa-triangle-exclamation text-gold-brand"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-semibold text-white mb-1">Investment Risk Disclosure</h3>
+                            <p class="text-sm text-slate-400 leading-relaxed">Cryptocurrency investments carry significant risk of loss. Past performance does not guarantee future results. Please invest only what you can afford to lose. All APR figures are historical estimates and may vary based on market conditions.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800 bg-navy-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <div class="md:col-span-1">
+                    <div class="flex items-center gap-2.5 mb-4">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-brand to-cyan-glow flex items-center justify-center">
+                            <i class="fa-solid fa-mountain text-navy-900 text-xs"></i>
+                        </div>
+                        <span class="font-display font-bold text-lg text-white">Apex<span class="text-cyan-brand">Mining</span></span>
+                    </div>
+                    <p class="text-sm text-slate-500 leading-relaxed">Professional cryptocurrency mining, investment, and education platform.</p>
+                </div>
+                <div>
+                    <h4 class="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Platform</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="./mining.html" class="text-slate-400 hover:text-cyan-brand transition-colors">Cloud Mining</a></li>
+                        <li><a href="./investments.html" class="text-slate-400 hover:text-cyan-brand transition-colors">Investments</a></li>
+                        <li><a href="./courses.html" class="text-slate-400 hover:text-cyan-brand transition-colors">Courses</a></li>
+                        <li><a href="./markets.html" class="text-slate-400 hover:text-cyan-brand transition-colors">Markets</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Company</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="./about.html" class="text-slate-400 hover:text-cyan-brand transition-colors">About Us</a></li>
+                        <li><a href="./about.html" class="text-slate-400 hover:text-cyan-brand transition-colors">Security</a></li>
+                        <li><a href="./about.html" class="text-slate-400 hover:text-cyan-brand transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Connect</h4>
+                    <div class="flex gap-3">
+                        <a href="#" class="w-9 h-9 rounded-lg bg-slate-800 flex items-center justify-center text-slate-400 hover:text-cyan-brand hover:bg-slate-700 transition-all"><i class="fa-brands fa-twitter"></i></a>
+                        <a href="#" class="w-9 h-9 rounded-lg bg-slate-800 flex items-center justify-center text-slate-400 hover:text-cyan-brand hover:bg-slate-700 transition-all"><i class="fa-brands fa-linkedin-in"></i></a>
+                        <a href="#" class="w-9 h-9 rounded-lg bg-slate-800 flex items-center justify-center text-slate-400 hover:text-cyan-brand hover:bg-slate-700 transition-all"><i class="fa-brands fa-telegram"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-sm text-slate-600">© 2026 Apex Mining. All rights reserved.</p>
+                <div class="flex gap-6 text-sm text-slate-600">
+                    <a href="#" class="hover:text-slate-400 transition-colors">Privacy Policy</a>
+                    <a href="#" class="hover:text-slate-400 transition-colors">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal-overlay hidden fixed inset-0 z-[100] items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+        <div class="bg-navy-800 border border-slate-700 rounded-2xl w-full max-w-md p-8 relative shadow-2xl">
+            <button onclick="closeModal('login-modal')" class="absolute top-4 right-4 text-slate-500 hover:text-white transition-colors"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <h2 class="font-display text-2xl font-bold text-white mb-1">Welcome Back</h2>
+            <p class="text-slate-400 text-sm mb-6">Log in to your Apex Mining account</p>
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Email Address</label>
+                    <input type="email" id="login-email" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-brand focus:ring-1 focus:ring-cyan-brand transition-all" placeholder="you@example.com" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Password</label>
+                    <input type="password" id="login-password" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-brand focus:ring-1 focus:ring-cyan-brand transition-all" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="w-full py-3 bg-cyan-brand text-navy-900 rounded-lg font-semibold hover:bg-cyan-glow transition-all btn-shine">Log In</button>
+            </form>
+            <p class="text-center text-sm text-slate-500 mt-6">Don't have an account? <a href="#" id="show-signup" class="text-cyan-brand hover:text-cyan-glow font-medium">Sign Up</a></p>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div id="signup-modal" class="modal-overlay hidden fixed inset-0 z-[100] items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+        <div class="bg-navy-800 border border-slate-700 rounded-2xl w-full max-w-md p-8 relative shadow-2xl max-h-[90vh] overflow-y-auto">
+            <button onclick="closeModal('signup-modal')" class="absolute top-4 right-4 text-slate-500 hover:text-white transition-colors"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <h2 class="font-display text-2xl font-bold text-white mb-1">Create Account</h2>
+            <p class="text-slate-400 text-sm mb-6">Join Apex Mining today</p>
+            <form id="signup-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Full Name</label>
+                    <input type="text" id="signup-name" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-brand focus:ring-1 focus:ring-cyan-brand transition-all" placeholder="John Smith" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Email Address</label>
+                    <input type="email" id="signup-email" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-brand focus:ring-1 focus:ring-cyan-brand transition-all" placeholder="you@example.com" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Phone Number</label>
+                    <input type="tel" id="signup-phone" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-brand focus:ring-1 focus:ring-cyan-brand transition-all" placeholder="+1 (555) 000-0000" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Country</label>
+                    <select id="signup-country" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-cyan-brand focus:ring-1 focus:ring-cyan-brand transition-all" required>
+                        <option value="">Select Country</option>
+                        <option value="US">United States</option>
+                        <option value="UK">United Kingdom</option>
+                        <option value="CA">Canada</option>
+                        <option value="AU">Australia</option>
+                        <option value="DE">Germany</option>
+                        <option value="FR">France</option>
+                        <option value="JP">Japan</option>
+                        <option value="SG">Singapore</option>
+                        <option value="AE">UAE</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Password</label>
+                    <input type="password" id="signup-password" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-brand focus:ring-1 focus:ring-cyan-brand transition-all" placeholder="Min. 6 characters" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Confirm Password</label>
+                    <input type="password" id="signup-confirm" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-brand focus:ring-1 focus:ring-cyan-brand transition-all" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="w-full py-3 bg-cyan-brand text-navy-900 rounded-lg font-semibold hover:bg-cyan-glow transition-all btn-shine">Create Account</button>
+            </form>
+            <p class="text-center text-sm text-slate-500 mt-6">Already have an account? <a href="#" id="show-login" class="text-cyan-brand hover:text-cyan-glow font-medium">Log In</a></p>
+        </div>
+    </div>
+
+    <script src="./script.js"></script>
+</body>
+</html>
