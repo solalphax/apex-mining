@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investments — Apex Mining</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter','sans-serif'], display: ['Space Grotesk','sans-serif'] },
+                    colors: { navy: {900:'#0a0e1a',800:'#0f172a',700:'#1e293b'}, cyan: {brand:'#06b6d4',glow:'#22d3ee'}, gold: {brand:'#f59e0b',glow:'#fbbf24'} }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #0a0e1a; }
+        .gradient-text { background: linear-gradient(135deg, #22d3ee, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .glass-card { background: rgba(15,23,42,0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); }
+        .btn-shine { position: relative; overflow: hidden; }
+        .btn-shine::after { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transition: left 0.5s; }
+        .btn-shine:hover::after { left: 100%; }
+        .hover-lift { transition: transform 0.3s, box-shadow 0.3s; }
+        .hover-lift:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+        .shimmer { background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        .risk-low { color: #10b981; }
+        .risk-medium { color: #f59e0b; }
+        .risk-high { color: #ef4444; }
+        .risk-very-high { color: #dc2626; }
+    </style>
+</head>
+<body class="text-slate-300 min-h-screen">
+
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-navy-900/90 backdrop-blur-xl border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            <div class="py-1.5 border-b border-slate-800/50 overflow-hidden">
+                <div id="header-ticker" class="text-xs text-slate-400 flex items-center gap-4 whitespace-nowrap">
+                    <span class="shimmer inline-block w-64 h-4 rounded"></span>
+                </div>
+            </div>
+            <div class="flex items-center justify-between h-16">
+                <a href="./index.html" class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-brand to-cyan-glow flex items-center justify-center">
+                        <i class="fa-solid fa-mountain text-navy-900 text-sm"></i>
+                    </div>
+                    <span class="font-display font-bold text-xl text-white tracking-tight">Apex<span class="text-cyan-brand">Mining</span></span>
+                </a>
+                <nav class="hidden md:flex items-center gap-1">
+                    <a href="./index.html" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40 transition-all">Home</a>
+                    <a href="./mining.html" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40 transition-all">Mining</a>
+                    <a href="./courses.html" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40 transition-all">Courses</a>
+                    <a href="./investments.html" class="px-3 py-2 rounded-lg text-sm font-medium text-white bg-slate-800/60">Investments</a>
+                    <a href="./dashboard.html" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40 transition-all">Dashboard</a>
+                    <a href="./markets.html" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40 transition-all">Markets</a>
+                    <a href="./about.html" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40 transition-all">About</a>
+                </nav>
+                <div class="flex items-center gap-3">
+                    <div id="auth-buttons" class="hidden md:flex items-center gap-2">
+                        <button onclick="openModal('login-modal')" class="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white transition-colors">Log In</button>
+                        <button onclick="openModal('signup-modal')" class="px-4 py-2 text-sm font-medium bg-cyan-brand text-navy-900 rounded-lg hover:bg-cyan-glow transition-colors btn-shine font-semibold">Sign Up</button>
+                    </div>
+                    <div id="user-menu" class="hidden md:flex items-center gap-3">
+                        <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800/60 border border-slate-700">
+                            <div class="w-7 h-7 rounded-full bg-gradient-to-br from-cyan-brand to-cyan-glow flex items-center justify-center text-navy-900 text-xs font-bold"><i class="fa-solid fa-user"></i></div>
+                            <span id="user-name-display" class="text-sm font-medium text-white">User</span>
+                        </div>
+                        <button id="logout-btn" class="text-slate-400 hover:text-red-400 transition-colors text-sm"><i class="fa-solid fa-right-from-bracket"></i></button>
+                    </div>
+                    <button id="mobile-menu-toggle" class="md:hidden p-2 text-slate-400 hover:text-white"><i class="fa-solid fa-bars text-lg"></i></button>
+                </div>
+            </div>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden bg-navy-900 border-t border-slate-800">
+            <div class="px-4 py-3 space-y-1">
+                <a href="./index.html" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40">Home</a>
+                <a href="./mining.html" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40">Mining</a>
+                <a href="./courses.html" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40">Courses</a>
+                <a href="./investments.html" class="block px-3 py-2 rounded-lg text-sm font-medium text-white bg-slate-800">Investments</a>
+                <a href="./dashboard.html" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40">Dashboard</a>
+                <a href="./markets.html" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40">Markets</a>
+                <a href="./about.html" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40">About</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="pt-[104px]">
+        <!-- Page Header -->
+        <section class="py-10 border-b border-slate-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6">
+                <div class="text-center mb-8">
+                    <h1 class="font-display text-3xl sm:text-4xl font-bold text-white mb-3">Investment Programs</h1>
+                    <p class="text-slate-400 max-w-2xl mx-auto">Diversify your portfolio with professionally managed crypto investment strategies. Choose from funds, staking, yield farming, and managed portfolios.</p>
+                </div>
+                <div class="flex flex-wrap justify-center gap-2">
+                    <button onclick="filterInvestments('all')" class="filter-btn px-4 py-2 rounded-lg bg-cyan-brand/10 text-cyan-brand text-sm font-medium border border-cyan-brand/20 hover:bg-cyan-brand/20 transition-all" data-filter="all">All Programs</button>
+                    <button onclick="filterInvestments('funds')" class="filter-btn px-4 py-2 rounded-lg bg-slate-800 text-slate-400 text-sm font-medium border border-slate-700 hover:text-white hover:bg-slate-700 transition-all" data-filter="funds">Crypto Funds</button>
+                    <button onclick="filterInvestments('staking')" class="filter-btn px-4 py-2 rounded-lg bg-slate-800 text-slate-400 text-sm font-medium border border-slate-700 hover:text-white hover:bg-slate-700 transition-all" data-filter="staking">Staking</button>
+                    <button onclick="filterInvestments('managed')" class="filter-btn px-4 py-2 rounded-lg bg-slate-800 text-slate-400 text-sm font-medium border border-slate-700 hover:text-white hover:bg-slate-700 transition-all" data-filter="managed">Managed Portfolios</button>
+                    <button onclick="filterInvestments('yield')" class="filter-btn px-4 py-2 rounded-lg bg-slate-800 text-slate-400 text-sm font-medium border border-slate-700 hover:text-white hover:bg-slate-700 transition-all" data-filter="yield">Yield Farming</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Investment Programs Grid -->
+        <section class="py-10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6">
+                <div id="investments-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    
+                    <!-- Program 1 -->
+                    <div class="investment-card glass-card rounded-xl overflow-hidden hover-lift" data-category="funds">
+                        <div class="h-32 bg-gradient-to-br from-cyan-brand/20 to-cyan-glow/10 flex items-center justify-center relative">
+                            <i class="fa-solid fa-layer-group text-cyan-brand/30 text-5xl"></i>
+                            <div class="absolute top-3 right-3 px-2 py-1 rounded-md bg-emerald-500/10 text-emerald-400 text-xs font-medium border border-emerald-500/20 risk-low">Low Risk</div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="px-2 py-0.5 rounded text-xs font-medium bg-cyan-brand/10 text-cyan-brand border border-cyan-brand/20">Crypto Funds</span>
+                            </div>
+                            <h3 class="text-lg font-semibold text-white mb-2">Bitcoin Index Fund</h3>
+                            <p class="text-sm text-slate-400 mb-4 leading-relaxed">Diversified exposure to top 10 cryptocurrencies with automatic rebalancing and institutional-grade custody.</p>
+                            <div class="grid grid-cols-2 gap-3 mb-4">
+                                <div class="bg-slate-800/50 rounded-lg p-3">
+                                    <div class="text-xs text-slate-500 mb-1">Min Investment</div>
+                                    <div class="text-sm font-semibold text-white">$1,000</div>
+                                </div>
+                                <div class="bg-slate-800/50 rounded-lg p-3">
+                                    <div class="text-xs text-slate-500 mb-1">Return (APR)</div>
+                                    <div class="text-sm font-semibold text-emerald-400">12% - 18%</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between pt-4 border-t border-slate-700">
+                                <div class="text-xs text-slate-500"><i class="fa-regular fa-clock mr-1"></i>Flexible</div>
+                                <button class="px-4 py-2 bg-cyan-brand text-navy-900 rounded-lg text-sm font-semibold hover:bg-cyan-glow transition-all">Invest Now</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Program 2 -->
+                    <div class="investment-card glass-card rounded-xl overflow-hidden hover-lift" data-category="staking">
+                        <div class="h-32 bg-gradient-to-br from-purple-500/20 to-purple-600/10 flex items-center justify-center relative">
+                            <i class="fa-solid fa-lock text-purple-400/30 text-5xl"></i>
+                            <div class="absolute top-3 right-3 px-2 py-1 rounded-md bg-emerald-500/10 text-emerald-400 text-xs font-medium border border-emerald-500/20 risk-low">Low Risk</div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="px-2 py-0.5 rounded text-xs font-medium bg-purple-500/10 text-purple-400 border border-purple-500/20">Staking</span>
+                            </div>
+                            <h3 class="text-lg font-semibold text-white mb-2">Ethereum Staking Pool</h3>
+                            <p class="text-sm text-slate-400 mb-4 leading-relaxed">Stake ETH with our validator nodes and earn consistent rewards with no minimum lock-up period.</p>
+                            <div class="grid grid-cols-2 gap-3 mb-4">
+                                <div class="bg-slate-800/50 rounded-lg p-3">
+                                    <div class="text-xs text-slate-500 mb-1">Min Investment</div>
+                                    <div class="text-sm font-semibold text-white">$500</div>
+                                </div>
+                                <div class="bg-slate-800/50 rounded-lg p-3">
+                                    <div class="text-xs text-slate-500 mb-1">Return (APR)</div>
+                                    <div class="text-sm font-semibold text-emerald-400">4% - 6%</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between pt-4 border-t border-slate-700">
+                                <div class="text-xs text-slate-500"><i class="fa-regular fa-clock mr-1"></i>Flexible</div>
+                                <button class="px-4 py-2 bg-cyan-brand text-navy-900 rounded-lg text-sm font-semibold hover:bg-cyan-glow transition-all">Invest Now</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Program 3 -->
+                    <div class="investment-card glass-card rounded-xl overflow-hidden hover-lift" data-category="managed">
+                        <div class="h-32 bg-gradient-to-br from-gold-brand/20 to-gold-glow/10 flex items-center justify-center relative">
+                            <i class="fa-solid fa-chart-pie text-gold-brand/30 text-5xl"></i>
+                            <div class="absolute top-3 right-3 px-2 py-1 rounded-md bg-amber-500/10 text-amber-400 text-xs font-medium border border-amber-500/20 risk-medium">Medium Risk</div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="px-2 py-0.5 rounded text-xs font-medium bg-gold-brand/10 text-gold-brand border border-gold-brand/20">Managed</span>
+                            </div>
+                            <h3 class="text-lg font-semibold text-white mb-2">Alpha Growth Portfolio</h3>
+                            <p class="text-sm text-slate-400 mb-4 leading-relaxed">Actively managed portfolio targeting high-growth altcoins with professional risk management and quarterly rebalancing.</p>
+                            <div class="grid grid-cols-2 gap-3 mb-4">
+                                <div class="bg-slate-800/50 rounded-lg p-3">
+                                    <div class="text-xs text-slate-500 mb-1">Min Investment</div>
+                                    <div class="text-sm font-semibold text-white">$5,000</div>
+                                </div>
+                                <div class="bg-slate-800/50 rounded-lg p-3">
+                                    <div class="text-xs text-slate-500 mb-1">Return (APR)</div>
+                                    <div class="text-sm font-semibold text-emerald-400">25% - 45%</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between pt-4 border-t border-slate-700">
+                                <div class="text-xs text-slate-500"><i class="fa-regular fa-clock mr-1"></i>12 Months</div>
+                                <button class="px-4 py-2 bg-cyan-brand text-navy-900 rounded-lg text-sm font-semibold hover:bg-cyan-glow transition-all">Invest Now</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Program 4 -->
+                    <div class="investment-card glass-card rounded-xl overflow-hidden hover-lift" data-category="yield">
+                        <div class="h-32 bg-gradient-to-br from-rose-500/20 to-rose-600/10 flex items-center justify-center relative">
+                            <i class="fa-solid fa-seedling text-rose-400/30 text-5xl"></i>
+                            <div class="absolute top-3 right-3 px-2 py-1 rounded-md bg-red-500/10 text-red-400 text-xs font-medium border border-red-500/20 risk-high">High Risk</div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="px-2 py-0.5 rounded text-xs font-medium bg-rose-500/10 text-rose-400 border border-rose-500/20">Yield Farming</span>
+                            </div>
+                            <h3 class="text-lg font-semibold text-white mb-2">DeFi Yield Maximizer</h3>
+                            <p class="text-sm text-slate-400 mb-4 leading-relaxed">Automated yield farming across multiple DeFi protocols with smart contract insurance and impermanent loss protection.</p>
+                            <div class="grid grid-cols-2 gap-3 mb-4">
+                                <div class="bg-slate-800/50 rounded-lg p-3">
+                                    <div class="text-xs text-slate-500 mb-1">Min Investment</div>
+                                    <div class="text-sm font-semibold text-white">$2,500</div>
+                                </div>
+                                <div class="bg-slate-800/50 rounded-lg p-3">
+                                    <div class="text-xs text-slate-500 mb-1">Return (APR)</div>
+                                    <div class="text-sm font-semibold text-emerald-400">35% - 120%</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between pt-4 border-t border-slate-700">
+                                <div class="text-xs text-slate-500"><i class="fa-regular fa-clock mr-1"></i>6 Months</div>
+                                <button class="px-4 py-2 bg-cyan-brand text-navy-900 rounded-lg text-sm font-semibold hover:bg-cyan-glow transition-all">Invest Now</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Program 5 -->
+                    <div class="investment-card glass-card rounded-xl overflow-hidden hover-lift" data-category="funds">
+                        <div class="h-32 bg-gradient-to-br from-indigo-500/20 to-indigo-600/10 flex items-center justify-center relative">
+                            <i class="fa-solid fa-coins text-indigo-400/30 text-5xl"></i>
+                            <div class="absolute top-3 right-3 px-2 py-1 rounded-md bg-amber-500/10 text-amber-400 text-xs font-medium border border-amber-500/20 risk-medium">Medium Risk</div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="px-2 py-0.5 rounded text-xs font-medium bg-cyan-brand/10 text-cyan-brand border border-cyan-brand/20">Crypto Funds</span>
+                            </div>
+                            <h3 class="text-lg font-semibold text-white mb-2">Altcoin Momentum Fund</h3>
+                            <p class="text-sm text-slate-400 mb-4 leading-relaxed">Quantitative fund targeting momentum in mid-cap cryptocurrencies with algorithmic entry and exit strategies.</p>
+                            <div class="grid grid-cols-2 gap-3 mb-4">
+                                <div class="bg-slate-800/50 rounded-lg p-3">
+                                    <div class="text-xs text-slate-500 mb-1">Min Investment</div>
+                                    <div class="text-sm font-semibold text-white">$3,000</div>
+                                </div>
+                                <div class="bg-slate-800/50 rounded-lg p-3">
+                                    <div class="text-xs text-slate-500 mb-1">Return (APR)</div>
+                                    <div class="text-sm font-semibold text-emerald-400">18% - 35%</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between pt-4 border-t border-slate-700">
+                                <div class="text-xs text-slate-500"><i class="fa-regular fa-clock mr-1"></i>Flexible</div>
+                                <button class="px-4 py-2 bg-cyan-brand text-navy-900 rounded-lg text-sm font-semibold hover:bg-cyan-glow transition-all">Invest Now</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Program 6 -->
+                    <div class="investment-card glass-card rounded-xl overflow-hidden hover-lift" data-category="staking">
+                        <div class="h-32 bg-gradient-to-br from-emerald-500/20 to-emerald-600/10 flex items-center justify-center relative">
+                            <i class="fa-solid fa-solar-panel text-emerald-400/30 text-5xl"></i>
+                            <div class="absolute top-3 right-3 px-2 py-1 rounded-md bg-emerald-500/10 text-emerald-400 text-xs font-medium border border-emerald-500/20 risk-low">Low Risk</div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="px-2 py-0.5 rounded text-xs font-medium bg-purple-500/10 text-purple-400 border border-purple-500/20">Staking</span>
+                            </div>
+                            <h3 class="text-lg font-semibold text-white mb-2">Green Energy Staking</h3>
+                            <p class="text-sm text-slate-400 mb-4 leading-relaxed">Environmentally conscious staking program powered by 100% renewable energy. Lower fees, higher ethics.</p>
+                            <div class="grid grid-cols-2 gap-3 mb-4">
+                                <div class="bg-slate-800/50 rounded-lg p-3">
+                                    <div class="text-xs text-slate-500 mb-1">Min Investment</div>
+                                    <div class="text-sm font-semibold text-white">$1,500</div>
+                                </div>
+                                <div class="bg-slate-800/50 rounded-lg p-3">
+                                    <div class="text-xs text-slate-500 mb-1">Return (APR)</div>
+                                    <div class="text-sm font-semibold text-emerald-400">6% - 9%</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between pt-4 border-t border-slate-700">
+                                <div class="text-xs text-slate-500"><i class="fa-regular fa-clock mr-1"></i>Flexible</div>
+                                <button class="px-4 py-2 bg-cyan-brand text-navy-900 rounded-lg text-sm font-semibold hover:bg-cyan-glow transition-all">Invest Now</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Program 7 -->
+                    <div class="investment-card glass-card rounded-xl overflow-hidden hover-lift" data-category="managed">
+                        <div class="h-32 bg-gradient-to-br from-orange-500/20 to-orange-600/10 flex items-center justify-center relative">
+                            <i class="fa-solid fa-briefcase text-orange-400/30 text-5xl"></i>
+                            <div class="absolute top-3 right-3 px-2 py-1 rounded-md bg-red-500/10 text-red-400 text-xs font-medium border border-red-500/20 risk-high">High Risk</div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="px-2 py-0.5 rounded text-xs font-medium bg-gold-brand/10 text-gold-brand border border-gold-brand/20">Managed</span>
+                            </div>
+                            <h3 class="text-lg font-semibold text-white mb-2">Venture Crypto Fund</h3>
+                            <p class="text-sm text-slate-400 mb-4 leading-relaxed">Early-stage crypto venture investments. High potential returns through strategic token allocations and private sales.</p>
+                            <div class="grid grid-cols-2 gap-3 mb-4">
+                                <div class="bg-slate-800/50 rounded-lg p-3">
+                                    <div class="text-xs text-slate-500 mb-1">Min Investment</div>
+                                    <div class="text-sm font-semibold text-white">$25,000</div>
+                                </div>
+                                <div class="bg-slate-800/50 rounded-lg p-3">
+                                    <div class="text-xs text-slate-500 mb-1">Return (APR)</div>
+                                    <div class="text-sm font-semibold text-emerald-400">50% - 200%</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between pt-4 border-t border-slate-700">
+                                <div class="text-xs text-slate-500"><i class="fa-regular fa-clock mr-1"></i>24 Months</div>
+                                <button class="px-4 py-2 bg-cyan-brand text-navy-900 rounded-lg text-sm font-semibold hover:bg-cyan-glow transition-all">Invest Now</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Program 8 -->
+                    <div class="investment-card glass-card rounded-xl overflow-hidden hover-lift" data-category="yield">
+                        <div class="h-32 bg-gradient-to-br from-pink-500/20 to-pink-600/10 flex items-center justify-center relative">
+                            <i class="fa-solid fa-water text-pink-400/30 text-5xl"></i>
+                            <div class="absolute top-3 right-3 px-2 py-1 rounded-md bg-red-500/10 text-red-400 text-xs font-medium border border-red-500/20 risk-very-high">Very High</div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="px-2 py-0.5 rounded text-xs font-medium bg-rose-500/10 text-rose-400 border border-rose-500/20">Yield Farming</span>
+                            </div>
+                            <h3 class="text-lg font-semibold text-white mb-2">Liquidity Mining Pro</h3>
+                            <p class="text-sm text-slate-400 mb-4 leading-relaxed">Advanced liquidity provision strategies across DEXs with automated compounding and hedging mechanisms for maximum yield.</p>
+                            <div class="grid grid-cols-2 gap-3 mb-4">
+                                <div class="bg-slate-800/50 rounded-lg p-3">
+                                    <div class="text-xs text-slate-500 mb-1">Min Investment</div>
+                                    <div class="text-sm font-semibold text-white">$10,000</div>
+                                </div>
+                                <div class="bg-slate-800/50 rounded-lg p-3">
+                                    <div class="text-xs text-slate-500 mb-1">Return (APR)</div>
+                                    <div class="text-sm font-semibold text-emerald-400">80% - 250%</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between pt-4 border-t border-slate-700">
+                                <div class="text-xs text-slate-500"><i class="fa-regular fa-clock mr-1"></i>3 Months</div>
+                                <button class="px-4 py-2 bg-cyan-brand text-navy-900 rounded-lg text-sm font-semibold hover:bg-cyan-glow transition-all">Invest Now</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Performance Section -->
+        <section class="py-16 border-t border-slate-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6">
+                <div class="text-center mb-10">
+                    <h2 class="font-display text-2xl sm:text-3xl font-bold text-white mb-3">Historical Performance</h2>
+                    <p class="text-slate-400">Average annual returns across all investment programs</p>
+                </div>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="glass-card rounded-xl p-6 text-center">
+                        <div class="text-3xl font-bold text-emerald-400 mb-1">+42.7%</div>
+                        <div class="text-sm text-slate-500">2023 Average</div>
+                    </div>
+                    <div class="glass-card rounded-xl p-6 text-center">
+                        <div class="text-3xl font-bold text-emerald-400 mb-1">+38.2%</div>
+                        <div class="text-sm text-slate-500">2024 Average</div>
+                    </div>
+                    <div class="glass-card rounded-xl p-6 text-center">
+                        <div class="text-3xl font-bold text-emerald-400 mb-1">+51.4%</div>
+                        <div class="text-sm text-slate-500">2025 YTD</div>
+                    </div>
+                    <div class="glass-card rounded-xl p-6 text-center">
+                        <div class="text-3xl font-bold text-cyan-brand mb-1">$2.4B</div>
+                        <div class="text-sm text-slate-500">Total AUM</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="py-16 border-t border-slate-800">
+            <div class="max-w-3xl mx-auto px-4 sm:px-6 text-center">
+                <h2 class="font-display text-2xl font-bold text-white mb-4">Ready to Grow Your Portfolio?</h2>
+                <p class="text-slate-400 mb-6">Start with as little as $500. All investments are insured and monitored 24/7 by our security team.</p>
+                <button onclick="openModal('signup-modal')" class="px-8 py-3.5 bg-cyan-brand text-navy-900 rounded-xl font-semibold hover:bg-cyan-glow transition-all btn-shine shadow-lg shadow-cyan-brand/20">
+                    Start Investing <i class="fa-solid fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800 bg-navy-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <div class="md:col-span-1">
+                    <div class="flex items-center gap-2.5 mb-4">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-brand to-cyan-glow flex items-center justify-center">
+                            <i class="fa-solid fa-mountain text-navy-900 text-xs"></i>
+                        </div>
+                        <span class="font-display font-bold text-lg text-white">Apex<span class="text-cyan-brand">Mining</span></span>
+                    </div>
+                    <p class="text-sm text-slate-500 leading-relaxed">Professional cryptocurrency mining, investment, and education platform.</p>
+                </div>
+                <div>
+                    <h4 class="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Platform</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="./mining.html" class="text-slate-400 hover:text-cyan-brand transition-colors">Cloud Mining</a></li>
+                        <li><a href="./investments.html" class="text-slate-400 hover:text-cyan-brand transition-colors">Investments</a></li>
+                        <li><a href="./courses.html" class="text-slate-400 hover:text-cyan-brand transition-colors">Courses</a></li>
+                        <li><a href="./markets.html" class="text-slate-400 hover:text-cyan-brand transition-colors">Markets</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Company</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="./about.html" class="text-slate-400 hover:text-cyan-brand transition-colors">About Us</a></li>
+                        <li><a href="./about.html" class="text-slate-400 hover:text-cyan-brand transition-colors">Security</a></li>
+                        <li><a href="./about.html" class="text-slate-400 hover:text-cyan-brand transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Connect</h4>
+                    <div class="flex gap-3">
+                        <a href="#" class="w-9 h-9 rounded-lg bg-slate-800 flex items-center justify-center text-slate-400 hover:text-cyan-brand hover:bg-slate-700 transition-all"><i class="fa-brands fa-twitter"></i></a>
+                        <a href="#" class="w-9 h-9 rounded-lg bg-slate-800 flex items-center justify-center text-slate-400 hover:text-cyan-brand hover:bg-slate-700 transition-all"><i class="fa-brands fa-linkedin-in"></i></a>
+                        <a href="#" class="w-9 h-9 rounded-lg bg-slate-800 flex items-center justify-center text-slate-400 hover:text-cyan-brand hover:bg-slate-700 transition-all"><i class="fa-brands fa-telegram"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-sm text-slate-600">© 2026 Apex Mining. All rights reserved.</p>
+                <div class="flex gap-6 text-sm text-slate-600">
+                    <a href="#" class="hover:text-slate-400 transition-colors">Privacy Policy</a>
+                    <a href="#" class="hover:text-slate-400 transition-colors">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal-overlay hidden fixed inset-0 z-[100] items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+        <div class="bg-navy-800 border border-slate-700 rounded-2xl w-full max-w-md p-8 relative shadow-2xl">
+            <button onclick="closeModal('login-modal')" class="absolute top-4 right-4 text-slate-500 hover:text-white transition-colors"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <h2 class="font-display text-2xl font-bold text-white mb-1">Welcome Back</h2>
+            <p class="text-slate-400 text-sm mb-6">Log in to your Apex Mining account</p>
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Email Address</label>
+                    <input type="email" id="login-email" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-brand focus:ring-1 focus:ring-cyan-brand transition-all" placeholder="you@example.com" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Password</label>
+                    <input type="password" id="login-password" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-brand focus:ring-1 focus:ring-cyan-brand transition-all" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="w-full py-3 bg-cyan-brand text-navy-900 rounded-lg font-semibold hover:bg-cyan-glow transition-all btn-shine">Log In</button>
+            </form>
+            <p class="text-center text-sm text-slate-500 mt-6">Don't have an account? <a href="#" id="show-signup" class="text-cyan-brand hover:text-cyan-glow font-medium">Sign Up</a></p>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div id="signup-modal" class="modal-overlay hidden fixed inset-0 z-[100] items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+        <div class="bg-navy-800 border border-slate-700 rounded-2xl w-full max-w-md p-8 relative shadow-2xl max-h-[90vh] overflow-y-auto">
+            <button onclick="closeModal('signup-modal')" class="absolute top-4 right-4 text-slate-500 hover:text-white transition-colors"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <h2 class="font-display text-2xl font-bold text-white mb-1">Create Account</h2>
+            <p class="text-slate-400 text-sm mb-6">Join Apex Mining today</p>
+            <form id="signup-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Full Name</label>
+                    <input type="text" id="signup-name" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-brand focus:ring-1 focus:ring-cyan-brand transition-all" placeholder="John Smith" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Email Address</label>
+                    <input type="email" id="signup-email" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-brand focus:ring-1 focus:ring-cyan-brand transition-all" placeholder="you@example.com" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Phone Number</label>
+                    <input type="tel" id="signup-phone" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-brand focus:ring-1 focus:ring-cyan-brand transition-all" placeholder="+1 (555) 000-0000" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Country</label>
+                    <select id="signup-country" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-cyan-brand focus:ring-1 focus:ring-cyan-brand transition-all" required>
+                        <option value="">Select Country</option>
+                        <option value="US">United States</option>
+                        <option value="UK">United Kingdom</option>
+                        <option value="CA">Canada</option>
+                        <option value="AU">Australia</option>
+                        <option value="DE">Germany</option>
+                        <option value="FR">France</option>
+                        <option value="JP">Japan</option>
+                        <option value="SG">Singapore</option>
+                        <option value="AE">UAE</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Password</label>
+                    <input type="password" id="signup-password" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-brand focus:ring-1 focus:ring-cyan-brand transition-all" placeholder="Min. 6 characters" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Confirm Password</label>
+                    <input type="password" id="signup-confirm" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-brand focus:ring-1 focus:ring-cyan-brand transition-all" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="w-full py-3 bg-cyan-brand text-navy-900 rounded-lg font-semibold hover:bg-cyan-glow transition-all btn-shine">Create Account</button>
+            </form>
+            <p class="text-center text-sm text-slate-500 mt-6">Already have an account? <a href="#" id="show-login" class="text-cyan-brand hover:text-cyan-glow font-medium">Log In</a></p>
+        </div>
+    </div>
+
+    <script src="./script.js"></script>
+    <script>
+        function filterInvestments(category) {
+            const cards = document.querySelectorAll('.investment-card');
+            const buttons = document.querySelectorAll('.filter-btn');
+            
+            buttons.forEach(btn => {
+                if(btn.dataset.filter === category) {
+                    btn.classList.remove('bg-slate-800', 'text-slate-400', 'border-slate-700');
+                    btn.classList.add('bg-cyan-brand/10', 'text-cyan-brand', 'border-cyan-brand/20');
+                } else {
+                    btn.classList.add('bg-slate-800', 'text-slate-400', 'border-slate-700');
+                    btn.classList.remove('bg-cyan-brand/10', 'text-cyan-brand', 'border-cyan-brand/20');
+                }
+            });
+            
+            cards.forEach(card => {
+                if(category === 'all' || card.dataset.category === category) {
+                    card.style.display = 'block';
+                    setTimeout(() => card.style.opacity = '1', 10);
+                } else {
+                    card.style.opacity = '0';
+                    setTimeout(() => card.style.display = 'none', 300);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
