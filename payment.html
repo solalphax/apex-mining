@@ -3,685 +3,817 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment — Apex Mining</title>
+    <title>Payment - Apex Mining</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Inter','sans-serif'], display: ['Space Grotesk','sans-serif'] },
-                    colors: { navy: {900:'#0a0e1a',800:'#0f172a',700:'#1e293b'}, cyan: {brand:'#06b6d4',glow:'#22d3ee'}, gold: {brand:'#f59e0b',glow:'#fbbf24'} }
+                    colors: {
+                        navy: { 900: '#0a0e1a', 800: '#111827', 700: '#1e293b' },
+                        cyan: { 400: '#22d3ee', 500: '#06b6d4' },
+                        gold: { 400: '#fbbf24', 500: '#f59e0b' }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif']
+                    }
                 }
             }
         }
     </script>
     <style>
-        body { font-family: 'Inter', sans-serif; background: #0a0e1a; }
-        .gradient-text { background: linear-gradient(135deg, #22d3ee, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .glass-card { background: rgba(15,23,42,0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); }
-        .btn-shine { position: relative; overflow: hidden; }
-        .btn-shine::after { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transition: left 0.5s; }
-        .btn-shine:hover::after { left: 100%; }
-        .hover-lift { transition: transform 0.3s, box-shadow 0.3s; }
-        .hover-lift:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
-        .shimmer { background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
-        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-        .payment-method { transition: all 0.3s; cursor: pointer; }
-        .payment-method:hover { border-color: rgba(6,182,212,0.4); background: rgba(6,182,212,0.05); }
-        .payment-method.selected { border-color: #06b6d4; background: rgba(6,182,212,0.1); }
-        .drop-zone { border: 2px dashed rgba(255,255,255,0.15); transition: all 0.3s; }
-        .drop-zone:hover, .drop-zone.dragover { border-color: #06b6d4; background: rgba(6,182,212,0.05); }
-        .wallet-address { font-family: 'Space Grotesk', monospace; }
+        body {
+            background: linear-gradient(135deg, #0a0e1a 0%, #111827 50%, #0a0e1a 100%);
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            color: #e2e8f0;
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+        }
+        .method-card {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .method-card:hover {
+            border-color: rgba(6, 182, 212, 0.4);
+            transform: translateY(-2px);
+        }
+        .method-card.selected {
+            border-color: #06b6d4;
+            background: rgba(6, 182, 212, 0.1);
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.2);
+        }
+        .method-card.selected::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            color: #06b6d4;
+            font-size: 18px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            color: white;
+            font-weight: 600;
+            padding: 14px 32px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            width: 100%;
+        }
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(6, 182, 212, 0.4);
+        }
+        .btn-primary:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        .btn-back {
+            background: rgba(255, 255, 255, 0.05);
+            color: #94a3b8;
+            font-weight: 500;
+            padding: 14px 32px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            width: 100%;
+        }
+        .btn-back:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+        }
+        .input-field {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 14px 16px;
+            color: #e2e8f0;
+            font-size: 15px;
+            width: 100%;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+        .input-field:focus {
+            border-color: #06b6d4;
+            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15);
+        }
+        .input-field::placeholder { color: #64748b; }
+        .upload-zone {
+            border: 2px dashed rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: #06b6d4;
+            background: rgba(6, 182, 212, 0.05);
+        }
+        .crypto-address {
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-family: 'Space Grotesk', monospace;
+            font-size: 13px;
+            color: #e2e8f0;
+            word-break: break-all;
+            position: relative;
+        }
+        .copy-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(6, 182, 212, 0.2);
+            color: #06b6d4;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+        .copy-btn:hover {
+            background: rgba(6, 182, 212, 0.3);
+        }
+        .qr-code {
+            width: 160px;
+            height: 160px;
+            background: white;
+            border-radius: 12px;
+            padding: 8px;
+            margin: 0 auto;
+        }
+        .qr-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            font-size: 48px;
+        }
+        .tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .tag-green { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+        .tag-amber { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+        .tag-red { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .hidden-field { display: none; }
+        .hidden-field.show { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(30, 41, 59, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-left: 3px solid #06b6d4;
+            padding: 16px 20px;
+            border-radius: 10px;
+            color: white;
+            font-size: 14px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
     </style>
 </head>
-<body class="text-slate-300 min-h-screen">
-
-    <!-- Header -->
-    <header class="fixed top-0 left-0 right-0 z-50 bg-navy-900/90 backdrop-blur-xl border-b border-slate-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6">
-            <div class="py-1.5 border-b border-slate-800/50 overflow-hidden">
-                <div id="header-ticker" class="text-xs text-slate-400 flex items-center gap-4 whitespace-nowrap">
-                    <span class="shimmer inline-block w-64 h-4 rounded"></span>
+<body>
+    <div class="min-h-screen flex items-center justify-center p-4">
+        <div class="w-full max-w-3xl">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-cyan-400/10 border border-cyan-500/20 mb-4">
+                    <i class="fas fa-credit-card text-2xl text-cyan-400"></i>
                 </div>
+                <h1 class="font-display text-3xl font-bold text-white mb-2" id="page-title">Complete Payment</h1>
+                <p class="text-slate-400" id="page-subtitle">Select your payment method and complete the transaction</p>
             </div>
-            <div class="flex items-center justify-between h-16">
-                <a href="./index.html" class="flex items-center gap-2.5">
-                    <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-brand to-cyan-glow flex items-center justify-center">
-                        <i class="fa-solid fa-mountain text-navy-900 text-sm"></i>
-                    </div>
-                    <span class="font-display font-bold text-xl text-white tracking-tight">Apex<span class="text-cyan-brand">Mining</span></span>
-                </a>
-                <nav class="hidden md:flex items-center gap-1">
-                    <a href="./index.html" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40 transition-all">Home</a>
-                    <a href="./mining.html" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40 transition-all">Mining</a>
-                    <a href="./courses.html" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40 transition-all">Courses</a>
-                    <a href="./investments.html" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40 transition-all">Investments</a>
-                    <a href="./dashboard.html" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40 transition-all">Dashboard</a>
-                    <a href="./markets.html" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40 transition-all">Markets</a>
-                    <a href="./about.html" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40 transition-all">About</a>
-                </nav>
-                <div class="flex items-center gap-3">
-                    <div id="auth-buttons" class="hidden md:flex items-center gap-2">
-                        <button onclick="openModal('login-modal')" class="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white transition-colors">Log In</button>
-                        <button onclick="openModal('signup-modal')" class="px-4 py-2 text-sm font-medium bg-cyan-brand text-navy-900 rounded-lg hover:bg-cyan-glow transition-colors btn-shine font-semibold">Sign Up</button>
-                    </div>
-                    <div id="user-menu" class="hidden md:flex items-center gap-3">
-                        <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800/60 border border-slate-700">
-                            <div class="w-7 h-7 rounded-full bg-gradient-to-br from-cyan-brand to-cyan-glow flex items-center justify-center text-navy-900 text-xs font-bold"><i class="fa-solid fa-user"></i></div>
-                            <span id="user-name-display" class="text-sm font-medium text-white">User</span>
-                        </div>
-                        <button id="logout-btn" class="text-slate-400 hover:text-red-400 transition-colors text-sm"><i class="fa-solid fa-right-from-bracket"></i></button>
-                    </div>
-                    <button id="mobile-menu-toggle" class="md:hidden p-2 text-slate-400 hover:text-white"><i class="fa-solid fa-bars text-lg"></i></button>
-                </div>
-            </div>
-        </div>
-        <div id="mobile-menu" class="hidden md:hidden bg-navy-900 border-t border-slate-800">
-            <div class="px-4 py-3 space-y-1">
-                <a href="./index.html" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40">Home</a>
-                <a href="./mining.html" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40">Mining</a>
-                <a href="./courses.html" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40">Courses</a>
-                <a href="./investments.html" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40">Investments</a>
-                <a href="./dashboard.html" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40">Dashboard</a>
-                <a href="./markets.html" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40">Markets</a>
-                <a href="./about.html" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40">About</a>
-            </div>
-        </div>
-    </header>
 
-    <main class="pt-[104px]">
-        <!-- Page Header -->
-        <section class="py-10 border-b border-slate-800">
-            <div class="max-w-4xl mx-auto px-4 sm:px-6">
-                <div class="text-center mb-8">
-                    <h1 class="font-display text-3xl sm:text-4xl font-bold text-white mb-3">Complete Your Payment</h1>
-                    <p class="text-slate-400">Select your preferred payment method and follow the instructions to complete your transaction.</p>
+            <!-- Order Summary -->
+            <div class="glass-card p-6 mb-6">
+                <h2 class="font-display text-lg font-semibold text-white mb-4">Order Summary</h2>
+                <div class="space-y-3 text-sm" id="order-summary">
+                    <div class="flex justify-between">
+                        <span class="text-slate-400">Type</span>
+                        <span class="text-white font-medium" id="order-type">Purchase</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-400">Item</span>
+                        <span class="text-white font-medium" id="order-item">-</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-400">Amount</span>
+                        <span class="text-white font-semibold" id="order-amount">$0.00</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-400">Processing Fee</span>
+                        <span class="text-slate-300" id="order-fee">$0.00</span>
+                    </div>
+                    <div class="border-t border-slate-700/50 pt-3 flex justify-between">
+                        <span class="text-slate-300 font-medium">Total</span>
+                        <span class="text-cyan-400 font-bold text-lg" id="order-total">$0.00</span>
+                    </div>
                 </div>
                 
-                <!-- Order Summary - DYNAMIC -->
-                <div class="glass-card rounded-xl p-6 mb-8">
-                    <h2 class="text-lg font-semibold text-white mb-4">Order Summary</h2>
-                    <div class="space-y-3">
-                        <div class="flex justify-between text-sm">
-                            <span class="text-slate-400">Type</span>
-                            <span class="text-white font-medium" id="order-type">Loading...</span>
+                <!-- Withdrawal Destination Info (Dynamic) -->
+                <div id="withdrawal-info" class="mt-4 pt-4 border-t border-slate-700/30 hidden">
+                    <h3 class="text-sm font-semibold text-white mb-2">Withdrawal Destination</h3>
+                    <div class="bg-slate-800/50 rounded-lg p-3 text-sm" id="destination-details">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Compliance Fee Notice (for withdrawals) -->
+            <div id="compliance-notice" class="glass-card p-6 mb-6 hidden" style="border-color: rgba(245, 158, 11, 0.3);">
+                <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-amber-500/20 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-shield-alt text-amber-400 text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-display text-lg font-semibold text-white mb-2">Account Verification Required</h3>
+                        <p class="text-slate-400 text-sm mb-3">To process your withdrawal, a one-time compliance verification fee is required. This fee covers KYC/AML verification and ensures secure fund transfers.</p>
+                        <div class="flex items-center gap-3">
+                            <span class="tag tag-amber">One-Time Fee</span>
+                            <span class="text-amber-400 font-bold text-xl">$800.00</span>
                         </div>
-                        <div class="flex justify-between text-sm">
-                            <span class="text-slate-400">Item</span>
-                            <span class="text-white font-medium" id="order-item">Loading...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Methods -->
+            <div class="glass-card p-6 mb-6">
+                <h2 class="font-display text-lg font-semibold text-white mb-4">Select Payment Method</h2>
+                
+                <!-- Crypto Options -->
+                <div class="mb-4">
+                    <p class="text-xs text-slate-500 uppercase tracking-wider mb-3">Cryptocurrency</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="method-card p-4 relative" onclick="selectPayment('btc')" id="pay-btc">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500/20 to-orange-400/10 flex items-center justify-center">
+                                    <i class="fab fa-bitcoin text-orange-400 text-lg"></i>
+                                </div>
+                                <div>
+                                    <p class="text-white font-medium">Bitcoin</p>
+                                    <p class="text-xs text-slate-500">BTC Network</p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="flex justify-between text-sm">
-                            <span class="text-slate-400">Amount</span>
-                            <span class="text-white font-medium" id="order-amount">$0.00</span>
+                        <div class="method-card p-4 relative" onclick="selectPayment('usdt')" id="pay-usdt">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500/20 to-green-400/10 flex items-center justify-center">
+                                    <i class="fas fa-coins text-green-400 text-lg"></i>
+                                </div>
+                                <div>
+                                    <p class="text-white font-medium">USDT</p>
+                                    <p class="text-xs text-slate-500">ERC20 / TRC20</p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="flex justify-between text-sm">
-                            <span class="text-slate-400">Processing Fee</span>
-                            <span class="text-white font-medium" id="order-fee">$0.00</span>
+                        <div class="method-card p-4 relative" onclick="selectPayment('eth')" id="pay-eth">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-purple-400/10 flex items-center justify-center">
+                                    <i class="fab fa-ethereum text-purple-400 text-lg"></i>
+                                </div>
+                                <div>
+                                    <p class="text-white font-medium">Ethereum</p>
+                                    <p class="text-xs text-slate-500">ERC20 Network</p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="border-t border-slate-700 pt-3 flex justify-between">
-                            <span class="text-slate-300 font-medium">Total</span>
-                            <span class="text-xl font-bold text-cyan-brand" id="order-total">$0.00</span>
+                        <div class="method-card p-4 relative" onclick="selectPayment('ltc')" id="pay-ltc">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-500/20 to-slate-400/10 flex items-center justify-center">
+                                    <i class="fas fa-litecoin-sign text-slate-400 text-lg"></i>
+                                </div>
+                                <div>
+                                    <p class="text-white font-medium">Litecoin</p>
+                                    <p class="text-xs text-slate-500">LTC Network</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Payment Methods -->
-                <div class="mb-8">
-                    <h2 class="text-lg font-semibold text-white mb-4">Select Payment Method</h2>
-                    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <!-- Crypto -->
-                        <div class="payment-method glass-card rounded-xl p-5 border border-transparent" onclick="selectPayment('crypto')">
-                            <div class="flex items-center gap-3 mb-3">
-                                <div class="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center">
-                                    <i class="fa-brands fa-bitcoin text-orange-400 text-lg"></i>
+                <!-- Other Options -->
+                <div>
+                    <p class="text-xs text-slate-500 uppercase tracking-wider mb-3">Other Methods</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="method-card p-4 relative" onclick="selectPayment('bank')" id="pay-bank">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-400/10 flex items-center justify-center">
+                                    <i class="fas fa-university text-blue-400 text-lg"></i>
                                 </div>
                                 <div>
-                                    <div class="font-medium text-white">Cryptocurrency</div>
-                                    <div class="text-xs text-slate-500">USDT / BTC / ETH / LTC</div>
+                                    <p class="text-white font-medium">Bank Transfer</p>
+                                    <p class="text-xs text-slate-500">Wire / ACH</p>
                                 </div>
                             </div>
-                            <div class="text-xs text-emerald-400"><i class="fa-solid fa-check-circle mr-1"></i>Fastest processing</div>
                         </div>
-
-                        <!-- Bank Transfer -->
-                        <div class="payment-method glass-card rounded-xl p-5 border border-transparent" onclick="selectPayment('bank')">
-                            <div class="flex items-center gap-3 mb-3">
-                                <div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                                    <i class="fa-solid fa-building-columns text-blue-400 text-lg"></i>
+                        <div class="method-card p-4 relative" onclick="selectPayment('cashapp')" id="pay-cashapp">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500/20 to-green-400/10 flex items-center justify-center">
+                                    <i class="fas fa-dollar-sign text-green-400 text-lg"></i>
                                 </div>
                                 <div>
-                                    <div class="font-medium text-white">Bank Transfer</div>
-                                    <div class="text-xs text-slate-500">Wire / ACH / SEPA</div>
+                                    <p class="text-white font-medium">Cash App</p>
+                                    <p class="text-xs text-slate-500">Instant Transfer</p>
                                 </div>
                             </div>
-                            <div class="text-xs text-slate-500"><i class="fa-regular fa-clock mr-1"></i>1-3 business days</div>
                         </div>
-
-                        <!-- Cash App -->
-                        <div class="payment-method glass-card rounded-xl p-5 border border-transparent" onclick="selectPayment('cashapp')">
-                            <div class="flex items-center gap-3 mb-3">
-                                <div class="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-                                    <i class="fa-solid fa-dollar-sign text-emerald-400 text-lg"></i>
+                        <div class="method-card p-4 relative" onclick="selectPayment('venmo')" id="pay-venmo">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500/20 to-cyan-400/10 flex items-center justify-center">
+                                    <i class="fas fa-v text-cyan-400 text-lg"></i>
                                 </div>
                                 <div>
-                                    <div class="font-medium text-white">Cash App</div>
-                                    <div class="text-xs text-slate-500">Instant transfer</div>
+                                    <p class="text-white font-medium">Venmo</p>
+                                    <p class="text-xs text-slate-500">Peer to Peer</p>
                                 </div>
                             </div>
-                            <div class="text-xs text-emerald-400"><i class="fa-solid fa-check-circle mr-1"></i>Instant</div>
                         </div>
-
-                        <!-- Venmo -->
-                        <div class="payment-method glass-card rounded-xl p-5 border border-transparent" onclick="selectPayment('venmo')">
-                            <div class="flex items-center gap-3 mb-3">
-                                <div class="w-10 h-10 rounded-lg bg-cyan-500/10 flex items-center justify-center">
-                                    <i class="fa-brands fa-vimeo-v text-cyan-400 text-lg"></i>
+                        <div class="method-card p-4 relative" onclick="selectPayment('zelle')" id="pay-zelle">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-purple-400/10 flex items-center justify-center">
+                                    <i class="fas fa-z text-purple-400 text-lg"></i>
                                 </div>
                                 <div>
-                                    <div class="font-medium text-white">Venmo</div>
-                                    <div class="text-xs text-slate-500">Peer-to-peer</div>
+                                    <p class="text-white font-medium">Zelle</p>
+                                    <p class="text-xs text-slate-500">Bank Network</p>
                                 </div>
                             </div>
-                            <div class="text-xs text-emerald-400"><i class="fa-solid fa-check-circle mr-1"></i>Instant</div>
                         </div>
+                    </div>
+                </div>
+            </div>
 
-                        <!-- Zelle -->
-                        <div class="payment-method glass-card rounded-xl p-5 border border-transparent" onclick="selectPayment('zelle')">
-                            <div class="flex items-center gap-3 mb-3">
-                                <div class="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
-                                    <i class="fa-solid fa-z text-purple-400 text-lg"></i>
-                                </div>
-                                <div>
-                                    <div class="font-medium text-white">Zelle</div>
-                                    <div class="text-xs text-slate-500">Bank-to-bank</div>
-                                </div>
+            <!-- Payment Details -->
+            <div class="glass-card p-6 mb-6" id="payment-details" style="display: none;">
+                <h2 class="font-display text-lg font-semibold text-white mb-4">Payment Details</h2>
+                
+                <!-- Crypto Payment Details -->
+                <div id="crypto-details" class="hidden-field">
+                    <div class="text-center mb-6">
+                        <div class="qr-code mb-4">
+                            <div class="qr-placeholder">
+                                <i class="fas fa-qrcode"></i>
                             </div>
-                            <div class="text-xs text-emerald-400"><i class="fa-solid fa-check-circle mr-1"></i>Instant</div>
                         </div>
-
-                        <!-- Apple Pay -->
-                        <div class="payment-method glass-card rounded-xl p-5 border border-transparent" onclick="selectPayment('applepay')">
-                            <div class="flex items-center gap-3 mb-3">
-                                <div class="w-10 h-10 rounded-lg bg-slate-500/10 flex items-center justify-center">
-                                    <i class="fa-brands fa-apple text-white text-lg"></i>
-                                </div>
-                                <div>
-                                    <div class="font-medium text-white">Apple Pay</div>
-                                    <div class="text-xs text-slate-500">Secure & fast</div>
-                                </div>
+                        <p class="text-sm text-slate-400 mb-2">Scan QR code or copy address below</p>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Wallet Address</label>
+                            <div class="crypto-address">
+                                <span id="wallet-address-display">1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa</span>
+                                <button class="copy-btn" onclick="copyAddress()">
+                                    <i class="fas fa-copy"></i> Copy
+                                </button>
                             </div>
-                            <div class="text-xs text-emerald-400"><i class="fa-solid fa-check-circle mr-1"></i>Instant</div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Network</label>
+                            <input type="text" class="input-field" id="network-display" value="Bitcoin Network" readonly>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Amount to Send</label>
+                            <input type="text" class="input-field font-mono" id="crypto-amount" value="0.02345678 BTC" readonly>
                         </div>
                     </div>
                 </div>
 
-                <!-- Payment Details -->
-                <div id="payment-details" class="glass-card rounded-xl p-6 mb-8 hidden">
-                    <!-- Crypto Details -->
-                    <div id="crypto-details" class="hidden">
-                        <h3 class="text-lg font-semibold text-white mb-4">Cryptocurrency Payment</h3>
-                        <div class="space-y-4">
+                <!-- Bank Transfer Details -->
+                <div id="bank-details" class="hidden-field">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Bank Name</label>
+                            <input type="text" class="input-field" value="JPMorgan Chase Bank" readonly>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-slate-300 mb-2">Select Coin</label>
-                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                                    <button onclick="selectCoin('btc')" class="coin-btn px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 text-white text-sm font-medium hover:border-orange-400 transition-all" data-coin="btc">
-                                        <i class="fa-brands fa-bitcoin mr-2 text-orange-400"></i>BTC
-                                    </button>
-                                    <button onclick="selectCoin('usdt')" class="coin-btn px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 text-white text-sm font-medium hover:border-emerald-400 transition-all selected" data-coin="usdt">
-                                        <i class="fa-solid fa-coins mr-2 text-emerald-400"></i>USDT
-                                    </button>
-                                    <button onclick="selectCoin('eth')" class="coin-btn px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 text-white text-sm font-medium hover:border-purple-400 transition-all" data-coin="eth">
-                                        <i class="fa-brands fa-ethereum mr-2 text-purple-400"></i>ETH
-                                    </button>
-                                    <button onclick="selectCoin('ltc')" class="coin-btn px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 text-white text-sm font-medium hover:border-slate-400 transition-all" data-coin="ltc">
-                                        <i class="fa-solid fa-litecoin-sign mr-2 text-slate-400"></i>LTC
+                                <label class="block text-sm font-medium text-slate-300 mb-2">Account Name</label>
+                                <input type="text" class="input-field" value="Apex Mining LLC" readonly>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-300 mb-2">Account Number</label>
+                                <div class="crypto-address">
+                                    <span>000123456789</span>
+                                    <button class="copy-btn" onclick="copyToClipboard('000123456789')">
+                                        <i class="fas fa-copy"></i> Copy
                                     </button>
                                 </div>
                             </div>
-                            <div class="bg-slate-800/50 rounded-lg p-4">
-                                <div class="text-sm text-slate-400 mb-2">Send payment to this address:</div>
-                                <div class="flex items-center gap-3">
-                                    <div class="wallet-address flex-1 px-4 py-3 bg-slate-900 rounded-lg text-cyan-brand text-sm font-mono break-all" id="wallet-address">0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb</div>
-                                    <button onclick="copyToClipboard('wallet-address')" class="px-4 py-3 bg-slate-700 rounded-lg text-white text-sm hover:bg-slate-600 transition-all">
-                                        <i class="fa-regular fa-copy"></i>
-                                    </button>
-                                </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Routing Number</label>
+                            <div class="crypto-address">
+                                <span>021000021</span>
+                                <button class="copy-btn" onclick="copyToClipboard('021000021')">
+                                    <i class="fas fa-copy"></i> Copy
+                                </button>
                             </div>
-                            <div class="bg-gold-brand/10 border border-gold-brand/20 rounded-lg p-4">
-                                <div class="flex items-start gap-3">
-                                    <i class="fa-solid fa-triangle-exclamation text-gold-brand mt-0.5"></i>
-                                    <div class="text-sm text-slate-300">
-                                        <span class="font-medium text-gold-brand">Important:</span> Send only <span id="coin-name">USDT (ERC-20)</span> to this address. Sending other coins may result in permanent loss.
-                                    </div>
-                                </div>
-                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">SWIFT Code (International)</label>
+                            <input type="text" class="input-field" value="CHASUS33" readonly>
+                        </div>
+                        <div class="p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+                            <p class="text-sm text-amber-400"><i class="fas fa-info-circle mr-2"></i> Please include your Order ID in the transfer memo: <strong id="order-id">ORD-2026-8847291</strong></p>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Bank Transfer Details -->
-                    <div id="bank-details" class="hidden">
-                        <h3 class="text-lg font-semibold text-white mb-4">Bank Transfer Instructions</h3>
-                        <div class="space-y-3">
-                            <div class="flex justify-between py-2 border-b border-slate-700">
-                                <span class="text-slate-400">Bank Name</span>
-                                <span class="text-white font-medium">JPMorgan Chase Bank</span>
-                            </div>
-                            <div class="flex justify-between py-2 border-b border-slate-700">
-                                <span class="text-slate-400">Account Name</span>
-                                <span class="text-white font-medium">Apex Mining LLC</span>
-                            </div>
-                            <div class="flex justify-between py-2 border-b border-slate-700">
-                                <span class="text-slate-400">Account Number</span>
-                                <span class="text-white font-medium wallet-address">000123456789</span>
-                            </div>
-                            <div class="flex justify-between py-2 border-b border-slate-700">
-                                <span class="text-slate-400">Routing Number</span>
-                                <span class="text-white font-medium wallet-address">021000021</span>
-                            </div>
-                            <div class="flex justify-between py-2">
-                                <span class="text-slate-400">SWIFT Code</span>
-                                <span class="text-white font-medium wallet-address">CHASUS33</span>
-                            </div>
+                <!-- Cash App Details -->
+                <div id="cashapp-details" class="hidden-field">
+                    <div class="text-center mb-6">
+                        <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-green-500/30 to-green-400/10 border border-green-500/30 flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-dollar-sign text-3xl text-green-400"></i>
                         </div>
-                        <div class="mt-4 bg-slate-800/50 rounded-lg p-4">
-                            <div class="text-sm text-slate-400 mb-1">Reference / Memo</div>
-                            <div class="text-white font-medium wallet-address" id="bank-reference">APEX-USER-88291</div>
-                        </div>
+                        <p class="text-white font-semibold text-lg">$ApexMiningOfficial</p>
+                        <p class="text-sm text-slate-400">Verified Business Account</p>
                     </div>
-
-                    <!-- Cash App Details -->
-                    <div id="cashapp-details" class="hidden">
-                        <h3 class="text-lg font-semibold text-white mb-4">Cash App Payment</h3>
-                        <div class="bg-slate-800/50 rounded-lg p-6 text-center">
-                            <div class="text-sm text-slate-400 mb-2">Send payment to:</div>
-                            <div class="text-2xl font-bold text-emerald-400 mb-2">$ApexMiningPay</div>
-                            <div class="text-sm text-slate-500">Cashtag</div>
-                        </div>
-                        <div class="mt-4 bg-gold-brand/10 border border-gold-brand/20 rounded-lg p-4">
-                            <div class="flex items-start gap-3">
-                                <i class="fa-solid fa-triangle-exclamation text-gold-brand mt-0.5"></i>
-                                <div class="text-sm text-slate-300">
-                                    <span class="font-medium text-gold-brand">Note:</span> Include your order reference in the payment note: <span class="text-white font-mono" id="cashapp-ref">APEX-88291</span>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="crypto-address mb-4">
+                        <span>$ApexMiningOfficial</span>
+                        <button class="copy-btn" onclick="copyToClipboard('$ApexMiningOfficial')">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
                     </div>
-
-                    <!-- Venmo Details -->
-                    <div id="venmo-details" class="hidden">
-                        <h3 class="text-lg font-semibold text-white mb-4">Venmo Payment</h3>
-                        <div class="bg-slate-800/50 rounded-lg p-6 text-center">
-                            <div class="text-sm text-slate-400 mb-2">Send payment to:</div>
-                            <div class="text-2xl font-bold text-cyan-brand mb-2">@ApexMining</div>
-                            <div class="text-sm text-slate-500">Username</div>
-                        </div>
-                        <div class="mt-4 bg-gold-brand/10 border border-gold-brand/20 rounded-lg p-4">
-                            <div class="flex items-start gap-3">
-                                <i class="fa-solid fa-triangle-exclamation text-gold-brand mt-0.5"></i>
-                                <div class="text-sm text-slate-300">
-                                    <span class="font-medium text-gold-brand">Note:</span> Set payment to "For goods and services" and include reference: <span class="text-white font-mono" id="venmo-ref">APEX-88291</span>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="p-4 bg-green-500/10 border border-green-500/20 rounded-lg">
+                        <p class="text-sm text-green-400"><i class="fas fa-info-circle mr-2"></i> Please include your Order ID in the note: <strong id="cashapp-order-id">ORD-2026-8847291</strong></p>
                     </div>
+                </div>
 
-                    <!-- Zelle Details -->
-                    <div id="zelle-details" class="hidden">
-                        <h3 class="text-lg font-semibold text-white mb-4">Zelle Payment</h3>
-                        <div class="bg-slate-800/50 rounded-lg p-6 text-center">
-                            <div class="text-sm text-slate-400 mb-2">Send to email:</div>
-                            <div class="text-xl font-bold text-purple-400 mb-2">payments@apexmining.com</div>
-                            <div class="text-sm text-slate-500">Registered with Zelle</div>
+                <!-- Venmo Details -->
+                <div id="venmo-details" class="hidden-field">
+                    <div class="text-center mb-6">
+                        <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-cyan-500/30 to-cyan-400/10 border border-cyan-500/30 flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-v text-3xl text-cyan-400"></i>
                         </div>
-                        <div class="mt-4 bg-gold-brand/10 border border-gold-brand/20 rounded-lg p-4">
-                            <div class="flex items-start gap-3">
-                                <i class="fa-solid fa-triangle-exclamation text-gold-brand mt-0.5"></i>
-                                <div class="text-sm text-slate-300">
-                                    <span class="font-medium text-gold-brand">Note:</span> Include your full name and reference: <span class="text-white font-mono" id="zelle-ref">APEX-88291</span>
-                                </div>
-                            </div>
-                        </div>
+                        <p class="text-white font-semibold text-lg">@Apex-Mining</p>
+                        <p class="text-sm text-slate-400">Verified Business Account</p>
                     </div>
+                    <div class="crypto-address mb-4">
+                        <span>@Apex-Mining</span>
+                        <button class="copy-btn" onclick="copyToClipboard('@Apex-Mining')">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                    </div>
+                </div>
 
-                    <!-- Apple Pay Details -->
-                    <div id="applepay-details" class="hidden">
-                        <h3 class="text-lg font-semibold text-white mb-4">Apple Pay Payment</h3>
-                        <div class="bg-slate-800/50 rounded-lg p-6 text-center">
-                            <div class="text-sm text-slate-400 mb-2">Send to phone number:</div>
-                            <div class="text-2xl font-bold text-white mb-2">+1 (888) 555-0199</div>
-                            <div class="text-sm text-slate-500">Registered Apple Pay</div>
+                <!-- Zelle Details -->
+                <div id="zelle-details" class="hidden-field">
+                    <div class="text-center mb-6">
+                        <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-500/30 to-purple-400/10 border border-purple-500/30 flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-z text-3xl text-purple-400"></i>
                         </div>
-                        <div class="mt-4 bg-gold-brand/10 border border-gold-brand/20 rounded-lg p-4">
-                            <div class="flex items-start gap-3">
-                                <i class="fa-solid fa-triangle-exclamation text-gold-brand mt-0.5"></i>
-                                <div class="text-sm text-slate-300">
-                                    <span class="font-medium text-gold-brand">Note:</span> Include reference in message: <span class="text-white font-mono" id="applepay-ref">APEX-88291</span>
-                                </div>
-                            </div>
-                        </div>
+                        <p class="text-white font-semibold text-lg">payments@apexmining.com</p>
+                        <p class="text-sm text-slate-400">Registered Zelle Email</p>
+                    </div>
+                    <div class="crypto-address mb-4">
+                        <span>payments@apexmining.com</span>
+                        <button class="copy-btn" onclick="copyToClipboard('payments@apexmining.com')">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
                     </div>
                 </div>
 
                 <!-- Upload Proof -->
-                <div class="glass-card rounded-xl p-6 mb-8">
-                    <h2 class="text-lg font-semibold text-white mb-4">Upload Payment Proof</h2>
-                    <p class="text-sm text-slate-400 mb-4">After completing your payment, upload a screenshot or receipt for verification.</p>
-                    
-                    <div class="drop-zone rounded-xl p-8 text-center" id="drop-zone">
-                        <i class="fa-solid fa-cloud-arrow-up text-4xl text-slate-600 mb-3"></i>
-                        <p class="text-sm text-slate-400 mb-2">Drag and drop your file here, or click to browse</p>
-                        <p class="text-xs text-slate-600">Supports: JPG, PNG, PDF (max 10MB)</p>
-                        <input type="file" id="proof-file" class="hidden" accept="image/*,.pdf">
+                <div class="mt-6 pt-6 border-t border-slate-700/30">
+                    <label class="block text-sm font-medium text-slate-300 mb-3">Upload Payment Proof</label>
+                    <div class="upload-zone" id="upload-zone" onclick="document.getElementById('proof-file').click()">
+                        <input type="file" id="proof-file" style="position: absolute; left: -9999px; opacity: 0;" accept="image/*,.pdf" onchange="handleFileUpload(this)">
+                        <i class="fas fa-cloud-upload-alt text-3xl text-slate-500 mb-3"></i>
+                        <p class="text-sm text-slate-400 mb-1">Drag and drop or click to upload</p>
+                        <p class="text-xs text-slate-500">Supports JPG, PNG, PDF (max 10MB)</p>
                     </div>
-                    
-                    <div id="file-preview" class="hidden mt-4">
-                        <div class="flex items-center gap-3 bg-slate-800/50 rounded-lg p-3">
-                            <i class="fa-solid fa-file-image text-cyan-brand"></i>
+                    <div id="file-preview" class="mt-3 hidden">
+                        <div class="flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg">
+                            <i class="fas fa-file-image text-cyan-400"></i>
                             <div class="flex-1">
-                                <div class="text-sm text-white" id="file-name">screenshot.png</div>
-                                <div class="text-xs text-slate-500" id="file-size">2.4 MB</div>
+                                <p class="text-sm text-white" id="file-name">screenshot.jpg</p>
+                                <p class="text-xs text-slate-500" id="file-size">2.4 MB</p>
                             </div>
-                            <button onclick="removeFile()" class="text-slate-500 hover:text-red-400 transition-colors">
-                                <i class="fa-solid fa-xmark"></i>
+                            <button class="text-red-400 hover:text-red-300" onclick="removeFile()">
+                                <i class="fas fa-times"></i>
                             </button>
                         </div>
                     </div>
                 </div>
-
-                <!-- Submit -->
-                <div class="flex flex-col sm:flex-row gap-4">
-                    <button onclick="submitPayment()" class="flex-1 py-4 bg-cyan-brand text-navy-900 rounded-xl font-semibold hover:bg-cyan-glow transition-all btn-shine shadow-lg shadow-cyan-brand/20 text-lg">
-                        <i class="fa-solid fa-check mr-2"></i>Confirm Payment
-                    </button>
-                    <a href="./dashboard.html" class="px-8 py-4 border border-slate-700 text-slate-400 rounded-xl font-medium hover:text-white hover:border-slate-500 transition-all text-center">
-                        Cancel
-                    </a>
-                </div>
             </div>
-        </section>
-    </main>
 
-    <!-- Footer -->
-    <footer class="border-t border-slate-800 bg-navy-900">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-12">
-            <div class="grid md:grid-cols-4 gap-8 mb-8">
-                <div class="md:col-span-1">
-                    <div class="flex items-center gap-2.5 mb-4">
-                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-brand to-cyan-glow flex items-center justify-center">
-                            <i class="fa-solid fa-mountain text-navy-900 text-xs"></i>
-                        </div>
-                        <span class="font-display font-bold text-lg text-white">Apex<span class="text-cyan-brand">Mining</span></span>
-                    </div>
-                    <p class="text-sm text-slate-500 leading-relaxed">Professional cryptocurrency mining, investment, and education platform.</p>
-                </div>
-                <div>
-                    <h4 class="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Platform</h4>
-                    <ul class="space-y-2 text-sm">
-                        <li><a href="./mining.html" class="text-slate-400 hover:text-cyan-brand transition-colors">Cloud Mining</a></li>
-                        <li><a href="./investments.html" class="text-slate-400 hover:text-cyan-brand transition-colors">Investments</a></li>
-                        <li><a href="./courses.html" class="text-slate-400 hover:text-cyan-brand transition-colors">Courses</a></li>
-                        <li><a href="./markets.html" class="text-slate-400 hover:text-cyan-brand transition-colors">Markets</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Company</h4>
-                    <ul class="space-y-2 text-sm">
-                        <li><a href="./about.html" class="text-slate-400 hover:text-cyan-brand transition-colors">About Us</a></li>
-                        <li><a href="./about.html" class="text-slate-400 hover:text-cyan-brand transition-colors">Security</a></li>
-                        <li><a href="./about.html" class="text-slate-400 hover:text-cyan-brand transition-colors">Contact</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Connect</h4>
-                    <div class="flex gap-3">
-                        <a href="#" class="w-9 h-9 rounded-lg bg-slate-800 flex items-center justify-center text-slate-400 hover:text-cyan-brand hover:bg-slate-700 transition-all"><i class="fa-brands fa-twitter"></i></a>
-                        <a href="#" class="w-9 h-9 rounded-lg bg-slate-800 flex items-center justify-center text-slate-400 hover:text-cyan-brand hover:bg-slate-700 transition-all"><i class="fa-brands fa-linkedin-in"></i></a>
-                        <a href="#" class="w-9 h-9 rounded-lg bg-slate-800 flex items-center justify-center text-slate-400 hover:text-cyan-brand hover:bg-slate-700 transition-all"><i class="fa-brands fa-telegram"></i></a>
-                    </div>
-                </div>
+            <!-- Action Buttons -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <button class="btn-back" onclick="goBack()">
+                    <i class="fas fa-arrow-left mr-2"></i> Back
+                </button>
+                <button class="btn-primary" id="btn-confirm" onclick="confirmPayment()" disabled>
+                    Confirm Payment <i class="fas fa-check ml-2"></i>
+                </button>
             </div>
-            <div class="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-                <p class="text-sm text-slate-600">© 2026 Apex Mining. All rights reserved.</p>
-                <div class="flex gap-6 text-sm text-slate-600">
-                    <a href="#" class="hover:text-slate-400 transition-colors">Privacy Policy</a>
-                    <a href="#" class="hover:text-slate-400 transition-colors">Terms of Service</a>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Login Modal -->
-    <div id="login-modal" class="modal-overlay hidden fixed inset-0 z-[100] items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-        <div class="bg-navy-800 border border-slate-700 rounded-2xl w-full max-w-md p-8 relative shadow-2xl">
-            <button onclick="closeModal('login-modal')" class="absolute top-4 right-4 text-slate-500 hover:text-white transition-colors"><i class="fa-solid fa-xmark text-xl"></i></button>
-            <h2 class="font-display text-2xl font-bold text-white mb-1">Welcome Back</h2>
-            <p class="text-slate-400 text-sm mb-6">Log in to your Apex Mining account</p>
-            <form id="login-form" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Email Address</label>
-                    <input type="email" id="login-email" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-brand focus:ring-1 focus:ring-cyan-brand transition-all" placeholder="you@example.com" required>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Password</label>
-                    <input type="password" id="login-password" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-brand focus:ring-1 focus:ring-cyan-brand transition-all" placeholder="••••••••" required>
-                </div>
-                <button type="submit" class="w-full py-3 bg-cyan-brand text-navy-900 rounded-lg font-semibold hover:bg-cyan-glow transition-all btn-shine">Log In</button>
-            </form>
-            <p class="text-center text-sm text-slate-500 mt-6">Don't have an account? <a href="#" id="show-signup" class="text-cyan-brand hover:text-cyan-glow font-medium">Sign Up</a></p>
         </div>
     </div>
 
-    <!-- Signup Modal -->
-    <div id="signup-modal" class="modal-overlay hidden fixed inset-0 z-[100] items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-        <div class="bg-navy-800 border border-slate-700 rounded-2xl w-full max-w-md p-8 relative shadow-2xl max-h-[90vh] overflow-y-auto">
-            <button onclick="closeModal('signup-modal')" class="absolute top-4 right-4 text-slate-500 hover:text-white transition-colors"><i class="fa-solid fa-xmark text-xl"></i></button>
-            <h2 class="font-display text-2xl font-bold text-white mb-1">Create Account</h2>
-            <p class="text-slate-400 text-sm mb-6">Join Apex Mining today</p>
-            <form id="signup-form" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Full Name</label>
-                    <input type="text" id="signup-name" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-brand focus:ring-1 focus:ring-cyan-brand transition-all" placeholder="John Smith" required>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Email Address</label>
-                    <input type="email" id="signup-email" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-brand focus:ring-1 focus:ring-cyan-brand transition-all" placeholder="you@example.com" required>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Phone Number</label>
-                    <input type="tel" id="signup-phone" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-brand focus:ring-1 focus:ring-cyan-brand transition-all" placeholder="+1 (555) 000-0000" required>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Country</label>
-                    <select id="signup-country" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-cyan-brand focus:ring-1 focus:ring-cyan-brand transition-all" required>
-                        <option value="">Select Country</option>
-                        <option value="US">United States</option>
-                        <option value="UK">United Kingdom</option>
-                        <option value="CA">Canada</option>
-                        <option value="AU">Australia</option>
-                        <option value="DE">Germany</option>
-                        <option value="FR">France</option>
-                        <option value="JP">Japan</option>
-                        <option value="SG">Singapore</option>
-                        <option value="AE">UAE</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Password</label>
-                    <input type="password" id="signup-password" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-brand focus:ring-1 focus:ring-cyan-brand transition-all" placeholder="Min. 6 characters" required>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Confirm Password</label>
-                    <input type="password" id="signup-confirm" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-brand focus:ring-1 focus:ring-cyan-brand transition-all" placeholder="••••••••" required>
-                </div>
-                <button type="submit" class="w-full py-3 bg-cyan-brand text-navy-900 rounded-lg font-semibold hover:bg-cyan-glow transition-all btn-shine">Create Account</button>
-            </form>
-            <p class="text-center text-sm text-slate-500 mt-6">Already have an account? <a href="#" id="show-login" class="text-cyan-brand hover:text-cyan-glow font-medium">Log In</a></p>
-        </div>
+    <!-- Toast -->
+    <div id="toast" class="toast">
+        <i class="fas fa-check-circle text-cyan-400 mr-2"></i>
+        <span id="toast-message">Copied to clipboard</span>
     </div>
 
-    <script src="./script.js"></script>
     <script>
-        // ===== DYNAMIC ORDER SUMMARY =====
-        // Reads from localStorage to show correct item based on what user clicked
-        
-        function loadOrderSummary() {
-            const orderData = JSON.parse(localStorage.getItem('apex_pending_order') || '{}');
+        let selectedPayment = null;
+        let uploadedFile = null;
+        let orderData = {};
+
+        // Crypto addresses
+        const cryptoAddresses = {
+            btc: { address: 'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh', network: 'Bitcoin Network', symbol: 'BTC' },
+            usdt: { address: '0xdAC17F958D2ee523a2206206994597C13D831ec7', network: 'Ethereum (ERC20)', symbol: 'USDT' },
+            eth: { address: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F', network: 'Ethereum Network', symbol: 'ETH' },
+            ltc: { address: 'ltc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh', network: 'Litecoin Network', symbol: 'LTC' }
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadOrderData();
+            setupDragDrop();
+        });
+
+        function loadOrderData() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const type = urlParams.get('type');
+            const fee = urlParams.get('fee');
+
+            try {
+                // Check for withdrawal data
+                const withdrawalData = JSON.parse(localStorage.getItem('apex_withdrawal_data') || '{}');
+                
+                if (type === 'withdrawal' && withdrawalData.amount) {
+                    // Withdrawal flow
+                    orderData = {
+                        type: 'Withdrawal',
+                        item: 'Fund Withdrawal',
+                        amount: withdrawalData.amount,
+                        fee: parseFloat(fee) || 800,
+                        total: withdrawalData.amount + (parseFloat(fee) || 800),
+                        isWithdrawal: true,
+                        destination: withdrawalData.destination,
+                        method: withdrawalData.method
+                    };
+
+                    // Show compliance notice
+                    document.getElementById('compliance-notice').classList.remove('hidden');
+                    document.getElementById('page-title').textContent = 'Complete Withdrawal';
+                    document.getElementById('page-subtitle').textContent = 'Pay the compliance fee to process your withdrawal';
+
+                    // Show destination info
+                    showDestinationInfo(withdrawalData);
+                } else {
+                    // Purchase flow (from localStorage)
+                    const pendingOrder = JSON.parse(localStorage.getItem('apex_pending_order') || '{}');
+                    orderData = {
+                        type: pendingOrder.type || 'Purchase',
+                        item: pendingOrder.item || '-',
+                        amount: pendingOrder.amount || 0,
+                        fee: pendingOrder.fee || 0,
+                        total: (pendingOrder.amount || 0) + (pendingOrder.fee || 0),
+                        isWithdrawal: false
+                    };
+                }
+
+                updateSummary();
+            } catch(e) {
+                console.error('Error loading order data:', e);
+            }
+        }
+
+        function showDestinationInfo(data) {
+            const container = document.getElementById('withdrawal-info');
+            const details = document.getElementById('destination-details');
             
-            // Defaults
-            let type = 'Deposit';
-            let item = 'Account Funding';
-            let amount = 0;
-            let fee = 0;
-            
-            if (orderData && orderData.type) {
-                type = orderData.type;
-                item = orderData.item || 'Unknown';
-                amount = parseFloat(orderData.amount) || 0;
-                fee = parseFloat(orderData.fee) || 0;
+            let html = '';
+            if (data.method === 'cashapp') {
+                html = '<p class="text-slate-300"><i class="fas fa-dollar-sign text-green-400 mr-2"></i> Cash App: <span class="text-white font-medium">$' + data.destination.cashtag + '</span></p>';
+            } else if (data.method === 'bank') {
+                html = '<p class="text-slate-300"><i class="fas fa-university text-blue-400 mr-2"></i> ' + data.destination.bankName + '</p>';
+                html += '<p class="text-slate-400 text-xs mt-1">****' + data.destination.accountNumber.slice(-4) + ' | ' + data.destination.accountType + '</p>';
+            } else if (data.method === 'wallet') {
+                html = '<p class="text-slate-300"><i class="fas fa-cube text-amber-400 mr-2"></i> ' + data.destination.crypto + ' Wallet</p>';
+                html += '<p class="text-slate-400 text-xs mt-1 font-mono">' + data.destination.address.substring(0, 20) + '...</p>';
+                html += '<p class="text-slate-500 text-xs mt-1">' + data.destination.network + '</p>';
             }
             
-            // Format currency
-            const fmt = (n) => '$' + n.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-            
-            document.getElementById('order-type').textContent = type;
-            document.getElementById('order-item').textContent = item;
-            document.getElementById('order-amount').textContent = fmt(amount);
-            document.getElementById('order-fee').textContent = fmt(fee);
-            document.getElementById('order-total').textContent = fmt(amount + fee);
-            
-            // Update reference codes with order ID
-            const refCode = orderData.ref || 'APEX-' + Math.random().toString(36).substr(2, 8).toUpperCase();
-            document.getElementById('bank-reference').textContent = refCode;
-            document.getElementById('cashapp-ref').textContent = refCode;
-            document.getElementById('venmo-ref').textContent = refCode;
-            document.getElementById('zelle-ref').textContent = refCode;
-            document.getElementById('applepay-ref').textContent = refCode;
+            details.innerHTML = html;
+            container.classList.remove('hidden');
         }
-        
-        // Load on page ready
-        document.addEventListener('DOMContentLoaded', loadOrderSummary);
 
-        // ===== PAYMENT METHOD SELECTION =====
-        let selectedMethod = null;
-        let selectedCoinType = 'usdt';
+        function updateSummary() {
+            document.getElementById('order-type').textContent = orderData.type;
+            document.getElementById('order-item').textContent = orderData.item;
+            document.getElementById('order-amount').textContent = '$' + formatMoney(orderData.amount);
+            document.getElementById('order-fee').textContent = '$' + formatMoney(orderData.fee);
+            document.getElementById('order-total').textContent = '$' + formatMoney(orderData.total);
+        }
 
-        const walletAddresses = {
-            btc: 'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh',
-            usdt: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb',
-            eth: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb',
-            ltc: 'LTc5Z8Y6Xv8mQ2K9NpQrStUvWxYzAbCdEf'
-        };
-
-        const coinNames = {
-            btc: 'Bitcoin (BTC)',
-            usdt: 'USDT (ERC-20)',
-            eth: 'Ethereum (ETH)',
-            ltc: 'Litecoin (LTC)'
-        };
+        function formatMoney(amount) {
+            return amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
 
         function selectPayment(method) {
-            selectedMethod = method;
+            document.querySelectorAll('.method-card').forEach(card => card.classList.remove('selected'));
+            document.getElementById('pay-' + method).classList.add('selected');
+            selectedPayment = method;
+
+            // Show payment details
+            document.getElementById('payment-details').style.display = 'block';
             
-            document.querySelectorAll('.payment-method').forEach(el => {
-                el.classList.remove('selected');
-            });
-            event.currentTarget.classList.add('selected');
+            // Hide all detail sections
+            document.querySelectorAll('#payment-details .hidden-field').forEach(el => el.classList.remove('show'));
             
-            document.getElementById('payment-details').classList.remove('hidden');
-            
-            ['crypto', 'bank', 'cashapp', 'venmo', 'zelle', 'applepay'].forEach(m => {
-                document.getElementById(m + '-details').classList.add('hidden');
-            });
-            document.getElementById(method + '-details').classList.remove('hidden');
+            // Show relevant section
+            if (['btc', 'usdt', 'eth', 'ltc'].includes(method)) {
+                document.getElementById('crypto-details').classList.add('show');
+                updateCryptoDetails(method);
+            } else if (method === 'bank') {
+                document.getElementById('bank-details').classList.add('show');
+            } else if (method === 'cashapp') {
+                document.getElementById('cashapp-details').classList.add('show');
+            } else if (method === 'venmo') {
+                document.getElementById('venmo-details').classList.add('show');
+            } else if (method === 'zelle') {
+                document.getElementById('zelle-details').classList.add('show');
+            }
+
+            validateForm();
         }
 
-        function selectCoin(coin) {
-            selectedCoinType = coin;
+        function updateCryptoDetails(method) {
+            const data = cryptoAddresses[method];
+            document.getElementById('wallet-address-display').textContent = data.address;
+            document.getElementById('network-display').value = data.network;
             
-            document.querySelectorAll('.coin-btn').forEach(btn => {
-                btn.classList.remove('selected');
-                btn.style.borderColor = '';
-            });
-            event.currentTarget.classList.add('selected');
-            
-            const colors = { btc: '#f97316', usdt: '#10b981', eth: '#a855f7', ltc: '#94a3b8' };
-            event.currentTarget.style.borderColor = colors[coin];
-            
-            document.getElementById('wallet-address').textContent = walletAddresses[coin];
-            document.getElementById('coin-name').textContent = coinNames[coin];
+            // Calculate crypto amount (simplified)
+            const cryptoAmount = (orderData.total / 30000).toFixed(8); // Approximate BTC price
+            document.getElementById('crypto-amount').value = cryptoAmount + ' ' + data.symbol;
         }
 
-        // ===== DRAG & DROP UPLOAD =====
-        const dropZone = document.getElementById('drop-zone');
-        const fileInput = document.getElementById('proof-file');
+        function copyAddress() {
+            const address = document.getElementById('wallet-address-display').textContent;
+            copyToClipboard(address);
+        }
 
-        dropZone.addEventListener('click', () => fileInput.click());
-        
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.classList.add('dragover');
-        });
-        
-        dropZone.addEventListener('dragleave', () => {
-            dropZone.classList.remove('dragover');
-        });
-        
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('dragover');
-            if (e.dataTransfer.files.length) {
-                handleFile(e.dataTransfer.files[0]);
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Copied to clipboard');
+            }).catch(() => {
+                // Fallback
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showToast('Copied to clipboard');
+            });
+        }
+
+        function setupDragDrop() {
+            const zone = document.getElementById('upload-zone');
+            
+            zone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                zone.classList.add('dragover');
+            });
+            
+            zone.addEventListener('dragleave', () => {
+                zone.classList.remove('dragover');
+            });
+            
+            zone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                zone.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleFile(files[0]);
+                }
+            });
+        }
+
+        function handleFileUpload(input) {
+            if (input.files && input.files[0]) {
+                handleFile(input.files[0]);
             }
-        });
-        
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files.length) {
-                handleFile(e.target.files[0]);
-            }
-        });
+        }
 
         function handleFile(file) {
+            uploadedFile = file;
+            
+            const preview = document.getElementById('file-preview');
             document.getElementById('file-name').textContent = file.name;
             document.getElementById('file-size').textContent = (file.size / 1024 / 1024).toFixed(2) + ' MB';
-            document.getElementById('file-preview').classList.remove('hidden');
+            preview.classList.remove('hidden');
+            
+            validateForm();
         }
 
         function removeFile() {
+            uploadedFile = null;
             document.getElementById('file-preview').classList.add('hidden');
             document.getElementById('proof-file').value = '';
+            validateForm();
         }
 
-        // ===== SUBMIT PAYMENT =====
-        function submitPayment() {
-            if (!selectedMethod) {
-                showToast('Please select a payment method', 'error');
-                return;
-            }
-            
-            // Save payment record
-            const orderData = JSON.parse(localStorage.getItem('apex_pending_order') || '{}');
-            const paymentRecord = {
-                ...orderData,
-                paymentMethod: selectedMethod,
-                status: 'pending_verification',
-                submittedAt: new Date().toISOString()
+        function validateForm() {
+            const isValid = selectedPayment && uploadedFile;
+            document.getElementById('btn-confirm').disabled = !isValid;
+        }
+
+        function confirmPayment() {
+            // Save transaction
+            const transaction = {
+                id: 'TX-' + Date.now(),
+                type: orderData.type,
+                amount: orderData.total,
+                paymentMethod: selectedPayment,
+                status: 'Pending Verification',
+                timestamp: new Date().toISOString(),
+                fileName: uploadedFile ? uploadedFile.name : null
             };
-            
-            // Add to transaction history
-            const history = JSON.parse(localStorage.getItem('apex_tx_history') || '[]');
-            history.unshift(paymentRecord);
-            localStorage.setItem('apex_tx_history', JSON.stringify(history));
-            
-            // Clear pending order
-            localStorage.removeItem('apex_pending_order');
-            
-            showToast('Payment submitted for verification!', 'success');
+
+            try {
+                // Save to transaction history
+                const history = JSON.parse(localStorage.getItem('apex_transactions') || '[]');
+                history.unshift(transaction);
+                localStorage.setItem('apex_transactions', JSON.stringify(history));
+
+                // Clear pending data
+                localStorage.removeItem('apex_pending_order');
+                localStorage.removeItem('apex_withdrawal_data');
+
+                // Show success
+                showToast('Payment submitted for verification');
+                
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 2000);
+            } catch(e) {
+                console.error('Error saving transaction:', e);
+                showToast('Error processing payment. Please try again.');
+            }
+        }
+
+        function goBack() {
+            if (orderData.isWithdrawal) {
+                window.location.href = 'withdrawal-options.html';
+            } else {
+                window.location.href = 'dashboard.html';
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').textContent = message;
+            toast.classList.add('show');
             setTimeout(() => {
-                window.location.href = './dashboard.html';
-            }, 2000);
+                toast.classList.remove('show');
+            }, 3000);
         }
     </script>
 </body>
