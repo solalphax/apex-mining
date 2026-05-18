@@ -3,434 +3,550 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard — Apex Mining</title>
+    <title>Dashboard - Apex Mining</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Inter','sans-serif'], display: ['Space Grotesk','sans-serif'] },
-                    colors: { navy: {900:'#0a0e1a',800:'#0f172a',700:'#1e293b'}, cyan: {brand:'#06b6d4',glow:'#22d3ee'}, gold: {brand:'#f59e0b',glow:'#fbbf24'} }
+                    colors: {
+                        navy: { 900: '#0a0e1a', 800: '#111827', 700: '#1e293b' },
+                        cyan: { 400: '#22d3ee', 500: '#06b6d4' },
+                        gold: { 400: '#fbbf24', 500: '#f59e0b' }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif']
+                    }
                 }
             }
         }
     </script>
     <style>
-        body { font-family: 'Inter', sans-serif; background: #0a0e1a; }
-        .gradient-text { background: linear-gradient(135deg, #22d3ee, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .glass-card { background: rgba(15,23,42,0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); }
-        .btn-shine { position: relative; overflow: hidden; }
-        .btn-shine::after { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transition: left 0.5s; }
-        .btn-shine:hover::after { left: 100%; }
-        .hover-lift { transition: transform 0.3s, box-shadow 0.3s; }
-        .hover-lift:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
-        .shimmer { background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
-        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        body {
+            background: linear-gradient(135deg, #0a0e1a 0%, #111827 50%, #0a0e1a 100%);
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            color: #e2e8f0;
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+        }
+        .glass-card-hover {
+            transition: all 0.3s ease;
+        }
+        .glass-card-hover:hover {
+            border-color: rgba(6, 182, 212, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(6, 182, 212, 0.1);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            color: white;
+            font-weight: 600;
+            padding: 12px 24px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(6, 182, 212, 0.4);
+        }
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: #e2e8f0;
+            font-weight: 500;
+            padding: 12px 24px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(6, 182, 212, 0.3);
+        }
+        .stat-value {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        .allocation-bar {
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            overflow: hidden;
+        }
+        .allocation-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        .tx-positive { color: #22c55e; }
+        .tx-negative { color: #ef4444; }
+        .shimmer {
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .nav-link {
+            color: #94a3b8;
+            transition: color 0.3s ease;
+            padding: 8px 16px;
+            border-radius: 8px;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #06b6d4;
+            background: rgba(6, 182, 212, 0.1);
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge-green { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+        .badge-amber { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+        .badge-red { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
     </style>
 </head>
-<body class="text-slate-300 min-h-screen">
-
-    <!-- Header -->
-    <header class="fixed top-0 left-0 right-0 z-50 bg-navy-900/90 backdrop-blur-xl border-b border-slate-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6">
-            <div class="py-1.5 border-b border-slate-800/50 overflow-hidden">
-                <div id="header-ticker" class="text-xs text-slate-400 flex items-center gap-4 whitespace-nowrap">
-                    <span class="shimmer inline-block w-64 h-4 rounded"></span>
-                </div>
-            </div>
+<body>
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 glass-card border-b border-white/5" style="backdrop-filter: blur(20px);">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
-                <a href="./index.html" class="flex items-center gap-2.5">
-                    <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-brand to-cyan-glow flex items-center justify-center">
-                        <i class="fa-solid fa-mountain text-navy-900 text-sm"></i>
-                    </div>
-                    <span class="font-display font-bold text-xl text-white tracking-tight">Apex<span class="text-cyan-brand">Mining</span></span>
-                </a>
-                <nav class="hidden md:flex items-center gap-1">
-                    <a href="./index.html" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40 transition-all">Home</a>
-                    <a href="./mining.html" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40 transition-all">Mining</a>
-                    <a href="./courses.html" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40 transition-all">Courses</a>
-                    <a href="./investments.html" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40 transition-all">Investments</a>
-                    <a href="./dashboard.html" class="px-3 py-2 rounded-lg text-sm font-medium text-white bg-slate-800/60">Dashboard</a>
-                    <a href="./markets.html" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40 transition-all">Markets</a>
-                    <a href="./about.html" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40 transition-all">About</a>
-                </nav>
                 <div class="flex items-center gap-3">
-                    <div id="auth-buttons" class="hidden md:flex items-center gap-2">
-                        <button onclick="openModal('login-modal')" class="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white transition-colors">Log In</button>
-                        <button onclick="openModal('signup-modal')" class="px-4 py-2 text-sm font-medium bg-cyan-brand text-navy-900 rounded-lg hover:bg-cyan-glow transition-colors btn-shine font-semibold">Sign Up</button>
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-cyan-400 flex items-center justify-center">
+                        <i class="fas fa-cube text-white text-sm"></i>
                     </div>
-                    <div id="user-menu" class="hidden md:flex items-center gap-3">
-                        <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800/60 border border-slate-700">
-                            <div class="w-7 h-7 rounded-full bg-gradient-to-br from-cyan-brand to-cyan-glow flex items-center justify-center text-navy-900 text-xs font-bold"><i class="fa-solid fa-user"></i></div>
-                            <span id="user-name-display" class="text-sm font-medium text-white">User</span>
-                        </div>
-                        <button id="logout-btn" class="text-slate-400 hover:text-red-400 transition-colors text-sm"><i class="fa-solid fa-right-from-bracket"></i></button>
+                    <span class="font-display font-bold text-xl text-white">Apex Mining</span>
+                </div>
+                <div class="hidden md:flex items-center gap-2">
+                    <a href="index.html" class="nav-link">Home</a>
+                    <a href="mining.html" class="nav-link">Mining</a>
+                    <a href="investments.html" class="nav-link">Investments</a>
+                    <a href="courses.html" class="nav-link">Courses</a>
+                    <a href="markets.html" class="nav-link">Markets</a>
+                    <a href="dashboard.html" class="nav-link active">Dashboard</a>
+                    <a href="about.html" class="nav-link">About</a>
+                    <a href="contact.html" class="nav-link">Contact</a>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button class="text-slate-400 hover:text-white transition-colors" onclick="showNotifications()">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500/30 to-cyan-400/10 border border-cyan-500/30 flex items-center justify-center">
+                        <i class="fas fa-user text-cyan-400 text-xs"></i>
                     </div>
-                    <button id="mobile-menu-toggle" class="md:hidden p-2 text-slate-400 hover:text-white"><i class="fa-solid fa-bars text-lg"></i></button>
                 </div>
             </div>
         </div>
-        <div id="mobile-menu" class="hidden md:hidden bg-navy-900 border-t border-slate-800">
-            <div class="px-4 py-3 space-y-1">
-                <a href="./index.html" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40">Home</a>
-                <a href="./mining.html" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40">Mining</a>
-                <a href="./courses.html" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40">Courses</a>
-                <a href="./investments.html" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40">Investments</a>
-                <a href="./dashboard.html" class="block px-3 py-2 rounded-lg text-sm font-medium text-white bg-slate-800">Dashboard</a>
-                <a href="./markets.html" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40">Markets</a>
-                <a href="./about.html" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40">About</a>
-            </div>
-        </div>
-    </header>
+    </nav>
 
-    <main class="pt-[104px]">
-        <!-- Dashboard Header -->
-        <section class="py-10 border-b border-slate-800">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6">
-                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+    <!-- Main Content -->
+    <div class="pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <!-- Page Header -->
+        <div class="mb-8">
+            <h1 class="font-display text-3xl font-bold text-white mb-2">Dashboard</h1>
+            <p class="text-slate-400">Manage your portfolio and track your earnings</p>
+        </div>
+
+        <!-- Balance Cards -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <!-- Total Balance -->
+            <div class="glass-card p-6 lg:col-span-2">
+                <div class="flex items-center justify-between mb-4">
                     <div>
-                        <h1 class="font-display text-3xl font-bold text-white mb-1">Portfolio Dashboard</h1>
-                        <p class="text-slate-400">Track your assets, earnings, and transactions</p>
+                        <p class="text-sm text-slate-400 mb-1">Total Portfolio Balance</p>
+                        <h2 class="font-display text-4xl font-bold text-white" id="total-balance">$17,820.00</h2>
+                        <div class="flex items-center gap-2 mt-2">
+                            <span class="badge badge-green"><i class="fas fa-arrow-up mr-1"></i> +2.4%</span>
+                            <span class="text-sm text-slate-500">24h change</span>
+                        </div>
                     </div>
-                    <div class="flex gap-3">
-                        <button onclick="initiateWithdrawal()" class="px-6 py-2.5 bg-red-500/10 text-red-400 border border-red-500/20 rounded-lg font-medium hover:bg-red-500/20 transition-all">
-                            <i class="fa-solid fa-arrow-down mr-2"></i>Withdraw
-                        </button>
-                        <button onclick="openModal('deposit-modal')" class="px-6 py-2.5 bg-cyan-brand text-navy-900 rounded-lg font-semibold hover:bg-cyan-glow transition-all btn-shine">
-                            <i class="fa-solid fa-plus mr-2"></i>Deposit
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Balance Cards -->
-                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                    <div class="glass-card rounded-xl p-5">
-                        <div class="text-xs text-slate-500 mb-1">Total Portfolio Balance</div>
-                        <div class="text-2xl font-bold text-white" id="total-balance">$17,820.00</div>
-                        <div class="text-xs text-emerald-400 mt-1"><i class="fa-solid fa-arrow-up mr-1"></i>+2.4% (24h)</div>
-                    </div>
-                    <div class="glass-card rounded-xl p-5">
-                        <div class="text-xs text-slate-500 mb-1">Available for Withdrawal</div>
-                        <div class="text-2xl font-bold text-white" id="available-balance">$17,820.00</div>
-                        <div class="text-xs text-slate-500 mt-1">Full balance unlocked</div>
-                    </div>
-                    <div class="glass-card rounded-xl p-5">
-                        <div class="text-xs text-slate-500 mb-1">Mining Earnings</div>
-                        <div class="text-2xl font-bold text-white">$8,420.00</div>
-                        <div class="text-xs text-emerald-400 mt-1"><i class="fa-solid fa-arrow-up mr-1"></i>+5.1% (24h)</div>
-                    </div>
-                    <div class="glass-card rounded-xl p-5">
-                        <div class="text-xs text-slate-500 mb-1">Investment Returns</div>
-                        <div class="text-2xl font-bold text-white">$9,400.00</div>
-                        <div class="text-xs text-emerald-400 mt-1"><i class="fa-solid fa-arrow-up mr-1"></i>+1.8% (24h)</div>
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-cyan-400/10 border border-cyan-500/20 flex items-center justify-center">
+                        <i class="fas fa-wallet text-2xl text-cyan-400"></i>
                     </div>
                 </div>
-
-                <!-- Asset Allocation -->
-                <div class="glass-card rounded-xl p-6 mb-8">
-                    <h2 class="text-lg font-semibold text-white mb-4">Asset Allocation</h2>
-                    <div class="space-y-4">
-                        <div>
-                            <div class="flex justify-between text-sm mb-1">
-                                <span class="text-slate-400">Bitcoin (BTC)</span>
-                                <span class="text-white font-medium">45%</span>
-                            </div>
-                            <div class="h-2 bg-slate-800 rounded-full overflow-hidden">
-                                <div class="h-full bg-orange-400 rounded-full" style="width: 45%"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="flex justify-between text-sm mb-1">
-                                <span class="text-slate-400">Ethereum (ETH)</span>
-                                <span class="text-white font-medium">30%</span>
-                            </div>
-                            <div class="h-2 bg-slate-800 rounded-full overflow-hidden">
-                                <div class="h-full bg-purple-400 rounded-full" style="width: 30%"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="flex justify-between text-sm mb-1">
-                                <span class="text-slate-400">Stablecoins</span>
-                                <span class="text-white font-medium">15%</span>
-                            </div>
-                            <div class="h-2 bg-slate-800 rounded-full overflow-hidden">
-                                <div class="h-full bg-emerald-400 rounded-full" style="width: 15%"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="flex justify-between text-sm mb-1">
-                                <span class="text-slate-400">Altcoins</span>
-                                <span class="text-white font-medium">10%</span>
-                            </div>
-                            <div class="h-2 bg-slate-800 rounded-full overflow-hidden">
-                                <div class="h-full bg-cyan-brand rounded-full" style="width: 10%"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Quick Actions -->
-                <div class="grid sm:grid-cols-3 gap-4 mb-8">
-                    <a href="./mining.html" class="glass-card rounded-xl p-5 hover-lift flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-xl bg-cyan-brand/10 flex items-center justify-center">
-                            <i class="fa-solid fa-microchip text-cyan-brand text-xl"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold text-white">Start Mining</div>
-                            <div class="text-sm text-slate-500">Purchase hash power</div>
-                        </div>
-                    </a>
-                    <a href="./investments.html" class="glass-card rounded-xl p-5 hover-lift flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-xl bg-gold-brand/10 flex items-center justify-center">
-                            <i class="fa-solid fa-chart-pie text-gold-brand text-xl"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold text-white">Invest</div>
-                            <div class="text-sm text-slate-500">Managed portfolios</div>
-                        </div>
-                    </a>
-                    <a href="./courses.html" class="glass-card rounded-xl p-5 hover-lift flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center">
-                            <i class="fa-solid fa-graduation-cap text-purple-400 text-xl"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold text-white">Learn</div>
-                            <div class="text-sm text-slate-500">Crypto courses</div>
-                        </div>
-                    </a>
-                </div>
-
-                <!-- Transaction History -->
-                <div class="glass-card rounded-xl overflow-hidden">
-                    <div class="p-6 border-b border-slate-800 flex items-center justify-between">
-                        <h2 class="text-lg font-semibold text-white">Transaction History</h2>
-                        <button class="text-sm text-cyan-brand hover:text-cyan-glow transition-colors">View All</button>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead>
-                                <tr class="border-b border-slate-800">
-                                    <th class="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Type</th>
-                                    <th class="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Asset</th>
-                                    <th class="text-right px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Amount</th>
-                                    <th class="text-right px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
-                                    <th class="text-right px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="border-b border-slate-800/50">
-                                    <td class="px-6 py-4">
-                                        <span class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-medium">
-                                            <i class="fa-solid fa-arrow-down"></i> Deposit
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 text-sm text-white">Bitcoin</td>
-                                    <td class="px-6 py-4 text-right text-sm text-emerald-400 font-medium">+0.45 BTC</td>
-                                    <td class="px-6 py-4 text-right"><span class="text-xs text-emerald-400">Completed</span></td>
-                                    <td class="px-6 py-4 text-right text-sm text-slate-500">May 15, 2026</td>
-                                </tr>
-                                <tr class="border-b border-slate-800/50">
-                                    <td class="px-6 py-4">
-                                        <span class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-cyan-brand/10 text-cyan-brand text-xs font-medium">
-                                            <i class="fa-solid fa-microchip"></i> Mining
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 text-sm text-white">Daily Reward</td>
-                                    <td class="px-6 py-4 text-right text-sm text-emerald-400 font-medium">+$124.50</td>
-                                    <td class="px-6 py-4 text-right"><span class="text-xs text-emerald-400">Completed</span></td>
-                                    <td class="px-6 py-4 text-right text-sm text-slate-500">May 14, 2026</td>
-                                </tr>
-                                <tr class="border-b border-slate-800/50">
-                                    <td class="px-6 py-4">
-                                        <span class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-gold-brand/10 text-gold-brand text-xs font-medium">
-                                            <i class="fa-solid fa-chart-line"></i> Investment
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 text-sm text-white">Alpha Growth</td>
-                                    <td class="px-6 py-4 text-right text-sm text-emerald-400 font-medium">+$892.00</td>
-                                    <td class="px-6 py-4 text-right"><span class="text-xs text-emerald-400">Completed</span></td>
-                                    <td class="px-6 py-4 text-right text-sm text-slate-500">May 12, 2026</td>
-                                </tr>
-                                <tr class="border-b border-slate-800/50">
-                                    <td class="px-6 py-4">
-                                        <span class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-red-500/10 text-red-400 text-xs font-medium">
-                                            <i class="fa-solid fa-arrow-up"></i> Withdrawal
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 text-sm text-white">USDT</td>
-                                    <td class="px-6 py-4 text-right text-sm text-red-400 font-medium">-$2,500.00</td>
-                                    <td class="px-6 py-4 text-right"><span class="text-xs text-amber-400">Pending</span></td>
-                                    <td class="px-6 py-4 text-right text-sm text-slate-500">May 10, 2026</td>
-                                </tr>
-                                <tr>
-                                    <td class="px-6 py-4">
-                                        <span class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-purple-500/10 text-purple-400 text-xs font-medium">
-                                            <i class="fa-solid fa-graduation-cap"></i> Course
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 text-sm text-white">Trading Pro</td>
-                                    <td class="px-6 py-4 text-right text-sm text-red-400 font-medium">-$299.00</td>
-                                    <td class="px-6 py-4 text-right"><span class="text-xs text-emerald-400">Completed</span></td>
-                                    <td class="px-6 py-4 text-right text-sm text-slate-500">May 8, 2026</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                <div class="flex gap-3 mt-6">
+                    <button onclick="window.location.href='withdrawal-options.html'" class="btn-primary flex-1">
+                        <i class="fas fa-arrow-down mr-2"></i> Withdraw
+                    </button>
+                    <button onclick="window.location.href='mining.html'" class="btn-secondary flex-1">
+                        <i class="fas fa-plus mr-2"></i> Invest More
+                    </button>
                 </div>
             </div>
-        </section>
-    </main>
 
-    <!-- Footer -->
-    <footer class="border-t border-slate-800 bg-navy-900">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-12">
-            <div class="grid md:grid-cols-4 gap-8 mb-8">
-                <div class="md:col-span-1">
-                    <div class="flex items-center gap-2.5 mb-4">
-                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-brand to-cyan-glow flex items-center justify-center">
-                            <i class="fa-solid fa-mountain text-navy-900 text-xs"></i>
+            <!-- Quick Stats -->
+            <div class="space-y-4">
+                <div class="glass-card p-5 glass-card-hover cursor-pointer">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-xs text-slate-400 mb-1">Mining Earnings</p>
+                            <p class="font-display text-xl font-bold text-white">$3,240.00</p>
+                            <p class="text-xs text-green-400 mt-1"><i class="fas fa-arrow-up mr-1"></i> +5.2% this week</p>
                         </div>
-                        <span class="font-display font-bold text-lg text-white">Apex<span class="text-cyan-brand">Mining</span></span>
-                    </div>
-                    <p class="text-sm text-slate-500 leading-relaxed">Professional cryptocurrency mining, investment, and education platform.</p>
-                </div>
-                <div>
-                    <h4 class="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Platform</h4>
-                    <ul class="space-y-2 text-sm">
-                        <li><a href="./mining.html" class="text-slate-400 hover:text-cyan-brand transition-colors">Cloud Mining</a></li>
-                        <li><a href="./investments.html" class="text-slate-400 hover:text-cyan-brand transition-colors">Investments</a></li>
-                        <li><a href="./courses.html" class="text-slate-400 hover:text-cyan-brand transition-colors">Courses</a></li>
-                        <li><a href="./markets.html" class="text-slate-400 hover:text-cyan-brand transition-colors">Markets</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Company</h4>
-                    <ul class="space-y-2 text-sm">
-                        <li><a href="./about.html" class="text-slate-400 hover:text-cyan-brand transition-colors">About Us</a></li>
-                        <li><a href="./about.html" class="text-slate-400 hover:text-cyan-brand transition-colors">Security</a></li>
-                        <li><a href="./about.html" class="text-slate-400 hover:text-cyan-brand transition-colors">Contact</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Connect</h4>
-                    <div class="flex gap-3">
-                        <a href="#" class="w-9 h-9 rounded-lg bg-slate-800 flex items-center justify-center text-slate-400 hover:text-cyan-brand hover:bg-slate-700 transition-all"><i class="fa-brands fa-twitter"></i></a>
-                        <a href="#" class="w-9 h-9 rounded-lg bg-slate-800 flex items-center justify-center text-slate-400 hover:text-cyan-brand hover:bg-slate-700 transition-all"><i class="fa-brands fa-linkedin-in"></i></a>
-                        <a href="#" class="w-9 h-9 rounded-lg bg-slate-800 flex items-center justify-center text-slate-400 hover:text-cyan-brand hover:bg-slate-700 transition-all"><i class="fa-brands fa-telegram"></i></a>
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500/20 to-green-400/10 border border-green-500/20 flex items-center justify-center">
+                            <i class="fas fa-hammer text-green-400 text-sm"></i>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-                <p class="text-sm text-slate-600">© 2026 Apex Mining. All rights reserved.</p>
-                <div class="flex gap-6 text-sm text-slate-600">
-                    <a href="#" class="hover:text-slate-400 transition-colors">Privacy Policy</a>
-                    <a href="#" class="hover:text-slate-400 transition-colors">Terms of Service</a>
+                <div class="glass-card p-5 glass-card-hover cursor-pointer">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-xs text-slate-400 mb-1">Investment Returns</p>
+                            <p class="font-display text-xl font-bold text-white">$1,890.50</p>
+                            <p class="text-xs text-green-400 mt-1"><i class="fas fa-arrow-up mr-1"></i> +1.8% this week</p>
+                        </div>
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-gold-500/20 to-gold-400/10 border border-gold-500/20 flex items-center justify-center">
+                            <i class="fas fa-chart-line text-gold-400 text-sm"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="glass-card p-5 glass-card-hover cursor-pointer">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-xs text-slate-400 mb-1">Pending Withdrawals</p>
+                            <p class="font-display text-xl font-bold text-white">$0.00</p>
+                            <p class="text-xs text-slate-500 mt-1">No pending transactions</p>
+                        </div>
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-500/20 to-slate-400/10 border border-slate-500/20 flex items-center justify-center">
+                            <i class="fas fa-clock text-slate-400 text-sm"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </footer>
 
-    <!-- Login Modal -->
-    <div id="login-modal" class="modal-overlay hidden fixed inset-0 z-[100] items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-        <div class="bg-navy-800 border border-slate-700 rounded-2xl w-full max-w-md p-8 relative shadow-2xl">
-            <button onclick="closeModal('login-modal')" class="absolute top-4 right-4 text-slate-500 hover:text-white transition-colors"><i class="fa-solid fa-xmark text-xl"></i></button>
-            <h2 class="font-display text-2xl font-bold text-white mb-1">Welcome Back</h2>
-            <p class="text-slate-400 text-sm mb-6">Log in to your Apex Mining account</p>
-            <form id="login-form" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Email Address</label>
-                    <input type="email" id="login-email" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-brand focus:ring-1 focus:ring-cyan-brand transition-all" placeholder="you@example.com" required>
+        <!-- Asset Allocation & Chart -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <!-- Asset Allocation -->
+            <div class="glass-card p-6">
+                <h3 class="font-display text-lg font-semibold text-white mb-4">Asset Allocation</h3>
+                <div class="space-y-4">
+                    <div>
+                        <div class="flex justify-between text-sm mb-2">
+                            <span class="text-slate-300">Bitcoin (BTC)</span>
+                            <span class="text-white font-semibold">45%</span>
+                        </div>
+                        <div class="allocation-bar">
+                            <div class="allocation-fill bg-gradient-to-r from-orange-500 to-orange-400" style="width: 45%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-sm mb-2">
+                            <span class="text-slate-300">Ethereum (ETH)</span>
+                            <span class="text-white font-semibold">28%</span>
+                        </div>
+                        <div class="allocation-bar">
+                            <div class="allocation-fill bg-gradient-to-r from-cyan-500 to-cyan-400" style="width: 28%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-sm mb-2">
+                            <span class="text-slate-300">Tether (USDT)</span>
+                            <span class="text-white font-semibold">15%</span>
+                        </div>
+                        <div class="allocation-bar">
+                            <div class="allocation-fill bg-gradient-to-r from-green-500 to-green-400" style="width: 15%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-sm mb-2">
+                            <span class="text-slate-300">Solana (SOL)</span>
+                            <span class="text-white font-semibold">8%</span>
+                        </div>
+                        <div class="allocation-bar">
+                            <div class="allocation-fill bg-gradient-to-r from-purple-500 to-purple-400" style="width: 8%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-sm mb-2">
+                            <span class="text-slate-300">Others</span>
+                            <span class="text-white font-semibold">4%</span>
+                        </div>
+                        <div class="allocation-bar">
+                            <div class="allocation-fill bg-gradient-to-r from-slate-500 to-slate-400" style="width: 4%"></div>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Password</label>
-                    <input type="password" id="login-password" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-brand focus:ring-1 focus:ring-cyan-brand transition-all" placeholder="••••••••" required>
+            </div>
+
+            <!-- Performance Chart -->
+            <div class="glass-card p-6 lg:col-span-2">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-display text-lg font-semibold text-white">Portfolio Performance</h3>
+                    <div class="flex gap-2">
+                        <button class="px-3 py-1 rounded-lg bg-cyan-500/20 text-cyan-400 text-xs font-medium">1W</button>
+                        <button class="px-3 py-1 rounded-lg bg-white/5 text-slate-400 text-xs font-medium hover:bg-white/10">1M</button>
+                        <button class="px-3 py-1 rounded-lg bg-white/5 text-slate-400 text-xs font-medium hover:bg-white/10">3M</button>
+                        <button class="px-3 py-1 rounded-lg bg-white/5 text-slate-400 text-xs font-medium hover:bg-white/10">1Y</button>
+                    </div>
                 </div>
-                <button type="submit" class="w-full py-3 bg-cyan-brand text-navy-900 rounded-lg font-semibold hover:bg-cyan-glow transition-all btn-shine">Log In</button>
-            </form>
-            <p class="text-center text-sm text-slate-500 mt-6">Don't have an account? <a href="#" id="show-signup" class="text-cyan-brand hover:text-cyan-glow font-medium">Sign Up</a></p>
+                <div class="h-64 flex items-end gap-2">
+                    <div class="flex-1 bg-gradient-to-t from-cyan-500/30 to-cyan-400/5 rounded-t-lg" style="height: 40%"></div>
+                    <div class="flex-1 bg-gradient-to-t from-cyan-500/30 to-cyan-400/5 rounded-t-lg" style="height: 55%"></div>
+                    <div class="flex-1 bg-gradient-to-t from-cyan-500/30 to-cyan-400/5 rounded-t-lg" style="height: 45%"></div>
+                    <div class="flex-1 bg-gradient-to-t from-cyan-500/30 to-cyan-400/5 rounded-t-lg" style="height: 70%"></div>
+                    <div class="flex-1 bg-gradient-to-t from-cyan-500/30 to-cyan-400/5 rounded-t-lg" style="height: 60%"></div>
+                    <div class="flex-1 bg-gradient-to-t from-cyan-500/30 to-cyan-400/5 rounded-t-lg" style="height: 80%"></div>
+                    <div class="flex-1 bg-gradient-to-t from-cyan-500/30 to-cyan-400/5 rounded-t-lg" style="height: 75%"></div>
+                    <div class="flex-1 bg-gradient-to-t from-cyan-500/40 to-cyan-400/10 rounded-t-lg" style="height: 100%"></div>
+                    <div class="flex-1 bg-gradient-to-t from-cyan-500/30 to-cyan-400/5 rounded-t-lg" style="height: 85%"></div>
+                    <div class="flex-1 bg-gradient-to-t from-cyan-500/30 to-cyan-400/5 rounded-t-lg" style="height: 90%"></div>
+                    <div class="flex-1 bg-gradient-to-t from-cyan-500/30 to-cyan-400/5 rounded-t-lg" style="height: 95%"></div>
+                    <div class="flex-1 bg-gradient-to-t from-cyan-500/30 to-cyan-400/5 rounded-t-lg" style="height: 88%"></div>
+                </div>
+                <div class="flex justify-between text-xs text-slate-500 mt-3">
+                    <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+                    <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Contracts -->
+        <div class="glass-card p-6 mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-display text-lg font-semibold text-white">Active Mining Contracts</h3>
+                <a href="mining.html" class="text-cyan-400 text-sm hover:text-cyan-300">View All <i class="fas fa-arrow-right ml-1"></i></a>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="text-slate-400 border-b border-slate-700/50">
+                            <th class="text-left py-3 px-4 font-medium">Contract</th>
+                            <th class="text-left py-3 px-4 font-medium">Hash Rate</th>
+                            <th class="text-left py-3 px-4 font-medium">Daily Return</th>
+                            <th class="text-left py-3 px-4 font-medium">Total Mined</th>
+                            <th class="text-left py-3 px-4 font-medium">Status</th>
+                            <th class="text-left py-3 px-4 font-medium">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b border-slate-700/30 hover:bg-white/5 transition-colors">
+                            <td class="py-4 px-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500/20 to-cyan-400/10 flex items-center justify-center">
+                                        <i class="fas fa-bolt text-cyan-400"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-white font-medium">Advanced Plan</p>
+                                        <p class="text-xs text-slate-500">Started Mar 15, 2026</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-4 px-4 text-white">28 TH/s</td>
+                            <td class="py-4 px-4 text-green-400">+$18.50</td>
+                            <td class="py-4 px-4 text-white">$1,240.50</td>
+                            <td class="py-4 px-4"><span class="badge badge-green">Active</span></td>
+                            <td class="py-4 px-4">
+                                <button class="text-cyan-400 hover:text-cyan-300 text-sm">Details</button>
+                            </td>
+                        </tr>
+                        <tr class="border-b border-slate-700/30 hover:bg-white/5 transition-colors">
+                            <td class="py-4 px-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-gold-500/20 to-gold-400/10 flex items-center justify-center">
+                                        <i class="fas fa-crown text-gold-400"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-white font-medium">Pro Plan</p>
+                                        <p class="text-xs text-slate-500">Started Feb 28, 2026</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-4 px-4 text-white">120 TH/s</td>
+                            <td class="py-4 px-4 text-green-400">+$82.30</td>
+                            <td class="py-4 px-4 text-white">$5,890.20</td>
+                            <td class="py-4 px-4"><span class="badge badge-green">Active</span></td>
+                            <td class="py-4 px-4">
+                                <button class="text-cyan-400 hover:text-cyan-300 text-sm">Details</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Transaction History -->
+        <div class="glass-card p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-display text-lg font-semibold text-white">Transaction History</h3>
+                <button class="text-cyan-400 text-sm hover:text-cyan-300">Export CSV <i class="fas fa-download ml-1"></i></button>
+            </div>
+            <div class="overflow-x-auto custom-scrollbar">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="text-slate-400 border-b border-slate-700/50">
+                            <th class="text-left py-3 px-4 font-medium">Transaction</th>
+                            <th class="text-left py-3 px-4 font-medium">Date</th>
+                            <th class="text-left py-3 px-4 font-medium">Amount</th>
+                            <th class="text-left py-3 px-4 font-medium">Status</th>
+                            <th class="text-left py-3 px-4 font-medium">TX ID</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tx-history">
+                        <tr class="border-b border-slate-700/30 hover:bg-white/5 transition-colors">
+                            <td class="py-4 px-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center">
+                                        <i class="fas fa-arrow-down text-green-400 text-xs"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-white font-medium">Mining Payout</p>
+                                        <p class="text-xs text-slate-500">BTC</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-4 px-4 text-slate-400">May 18, 2026</td>
+                            <td class="py-4 px-4 tx-positive font-semibold">+$125.40</td>
+                            <td class="py-4 px-4"><span class="badge badge-green">Completed</span></td>
+                            <td class="py-4 px-4 text-slate-500 font-mono text-xs">0x7a3f...9e2d</td>
+                        </tr>
+                        <tr class="border-b border-slate-700/30 hover:bg-white/5 transition-colors">
+                            <td class="py-4 px-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-lg bg-red-500/20 flex items-center justify-center">
+                                        <i class="fas fa-arrow-up text-red-400 text-xs"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-white font-medium">Withdrawal</p>
+                                        <p class="text-xs text-slate-500">Bank Transfer</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-4 px-4 text-slate-400">May 15, 2026</td>
+                            <td class="py-4 px-4 tx-negative font-semibold">-$2,500.00</td>
+                            <td class="py-4 px-4"><span class="badge badge-green">Completed</span></td>
+                            <td class="py-4 px-4 text-slate-500 font-mono text-xs">WD-8847291</td>
+                        </tr>
+                        <tr class="border-b border-slate-700/30 hover:bg-white/5 transition-colors">
+                            <td class="py-4 px-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center">
+                                        <i class="fas fa-plus text-cyan-400 text-xs"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-white font-medium">Contract Purchase</p>
+                                        <p class="text-xs text-slate-500">Advanced Plan</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-4 px-4 text-slate-400">May 10, 2026</td>
+                            <td class="py-4 px-4 tx-negative font-semibold">-$2,500.00</td>
+                            <td class="py-4 px-4"><span class="badge badge-green">Completed</span></td>
+                            <td class="py-4 px-4 text-slate-500 font-mono text-xs">CN-9923847</td>
+                        </tr>
+                        <tr class="border-b border-slate-700/30 hover:bg-white/5 transition-colors">
+                            <td class="py-4 px-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center">
+                                        <i class="fas fa-arrow-down text-green-400 text-xs"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-white font-medium">Investment Return</p>
+                                        <p class="text-xs text-slate-500">DeFi Yield</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-4 px-4 text-slate-400">May 8, 2026</td>
+                            <td class="py-4 px-4 tx-positive font-semibold">+$340.80</td>
+                            <td class="py-4 px-4"><span class="badge badge-green">Completed</span></td>
+                            <td class="py-4 px-4 text-slate-500 font-mono text-xs">0x3b8a...1f4c</td>
+                        </tr>
+                        <tr class="border-b border-slate-700/30 hover:bg-white/5 transition-colors">
+                            <td class="py-4 px-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center">
+                                        <i class="fas fa-arrow-down text-amber-400 text-xs"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-white font-medium">Referral Bonus</p>
+                                        <p class="text-xs text-slate-500">Tier 2</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-4 px-4 text-slate-400">May 5, 2026</td>
+                            <td class="py-4 px-4 tx-positive font-semibold">+$150.00</td>
+                            <td class="py-4 px-4"><span class="badge badge-green">Completed</span></td>
+                            <td class="py-4 px-4 text-slate-500 font-mono text-xs">RF-7729103</td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="py-4 px-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center">
+                                        <i class="fas fa-graduation-cap text-purple-400 text-xs"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-white font-medium">Course Purchase</p>
+                                        <p class="text-xs text-slate-500">Advanced Trading</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-4 px-4 text-slate-400">May 1, 2026</td>
+                            <td class="py-4 px-4 tx-negative font-semibold">-$299.00</td>
+                            <td class="py-4 px-4"><span class="badge badge-green">Completed</span></td>
+                            <td class="py-4 px-4 text-slate-500 font-mono text-xs">CS-5543210</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
-    <!-- Signup Modal -->
-    <div id="signup-modal" class="modal-overlay hidden fixed inset-0 z-[100] items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-        <div class="bg-navy-800 border border-slate-700 rounded-2xl w-full max-w-md p-8 relative shadow-2xl max-h-[90vh] overflow-y-auto">
-            <button onclick="closeModal('signup-modal')" class="absolute top-4 right-4 text-slate-500 hover:text-white transition-colors"><i class="fa-solid fa-xmark text-xl"></i></button>
-            <h2 class="font-display text-2xl font-bold text-white mb-1">Create Account</h2>
-            <p class="text-slate-400 text-sm mb-6">Join Apex Mining today</p>
-            <form id="signup-form" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Full Name</label>
-                    <input type="text" id="signup-name" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-brand focus:ring-1 focus:ring-cyan-brand transition-all" placeholder="John Smith" required>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Email Address</label>
-                    <input type="email" id="signup-email" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-brand focus:ring-1 focus:ring-cyan-brand transition-all" placeholder="you@example.com" required>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Phone Number</label>
-                    <input type="tel" id="signup-phone" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-brand focus:ring-1 focus:ring-cyan-brand transition-all" placeholder="+1 (555) 000-0000" required>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Country</label>
-                    <select id="signup-country" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-cyan-brand focus:ring-1 focus:ring-cyan-brand transition-all" required>
-                        <option value="">Select Country</option>
-                        <option value="US">United States</option>
-                        <option value="UK">United Kingdom</option>
-                        <option value="CA">Canada</option>
-                        <option value="AU">Australia</option>
-                        <option value="DE">Germany</option>
-                        <option value="FR">France</option>
-                        <option value="JP">Japan</option>
-                        <option value="SG">Singapore</option>
-                        <option value="AE">UAE</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Password</label>
-                    <input type="password" id="signup-password" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-brand focus:ring-1 focus:ring-cyan-brand transition-all" placeholder="Min. 6 characters" required>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Confirm Password</label>
-                    <input type="password" id="signup-confirm" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-cyan-brand focus:ring-1 focus:ring-cyan-brand transition-all" placeholder="••••••••" required>
-                </div>
-                <button type="submit" class="w-full py-3 bg-cyan-brand text-navy-900 rounded-lg font-semibold hover:bg-cyan-glow transition-all btn-shine">Create Account</button>
-            </form>
-            <p class="text-center text-sm text-slate-500 mt-6">Already have an account? <a href="#" id="show-login" class="text-cyan-brand hover:text-cyan-glow font-medium">Log In</a></p>
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 right-4 glass-card p-4 transform translate-y-20 opacity-0 transition-all duration-300 z-50" style="border-left: 3px solid #06b6d4;">
+        <div class="flex items-center gap-3">
+            <i class="fas fa-info-circle text-cyan-400"></i>
+            <span class="text-sm text-white" id="toast-message">Notification</span>
         </div>
     </div>
 
-    <script src="./script.js"></script>
     <script>
-        // Load and display balance from localStorage
-        function loadDashboardData() {
-            const state = JSON.parse(localStorage.getItem('apex_state') || '{}');
-            const balance = parseFloat(state.balance) || 17820.00;
-            
-            document.getElementById('total-balance').textContent = '$' + balance.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-            document.getElementById('available-balance').textContent = '$' + balance.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        // Load state from localStorage
+        function loadState() {
+            try {
+                const state = JSON.parse(localStorage.getItem('apex_state') || '{}');
+                if (state.balance) {
+                    document.getElementById('total-balance').textContent = '$' + state.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                }
+            } catch(e) {
+                console.error('Error loading state:', e);
+            }
         }
-        
-        document.addEventListener('DOMContentLoaded', loadDashboardData);
 
-        // Initiate withdrawal with FULL balance
-        function initiateWithdrawal() {
-            const state = JSON.parse(localStorage.getItem('apex_state') || '{}');
-            const balance = parseFloat(state.balance) || 17820.00;
-            
-            const order = {
-                type: 'Withdrawal',
-                item: 'Full Portfolio Withdrawal',
-                amount: balance,
-                fee: 800.00,
-                ref: 'APEX-' + Math.random().toString(36).substr(2, 8).toUpperCase(),
-                date: new Date().toISOString()
-            };
-            localStorage.setItem('apex_pending_order', JSON.stringify(order));
-            window.location.href = './payment.html';
+        function showNotifications() {
+            showToast('No new notifications');
         }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').textContent = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadState();
+        });
     </script>
 </body>
 </html>
