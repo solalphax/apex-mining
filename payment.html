@@ -132,48 +132,31 @@
             background: rgba(15, 23, 42, 0.9);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 10px;
-            padding: 12px 16px;
+            padding: 16px 56px 16px 16px;
             font-family: 'Space Grotesk', monospace;
-            font-size: 13px;
+            font-size: 14px;
             color: #e2e8f0;
             word-break: break-all;
             position: relative;
+            line-height: 1.5;
         }
         .copy-btn {
             position: absolute;
-            right: 8px;
+            right: 12px;
             top: 50%;
             transform: translateY(-50%);
             background: rgba(6, 182, 212, 0.2);
             color: #06b6d4;
             border: none;
-            padding: 6px 12px;
-            border-radius: 6px;
+            padding: 8px 14px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 13px;
             transition: all 0.3s ease;
+            white-space: nowrap;
         }
         .copy-btn:hover {
             background: rgba(6, 182, 212, 0.3);
-        }
-        .qr-code {
-            width: 160px;
-            height: 160px;
-            background: white;
-            border-radius: 12px;
-            padding: 8px;
-            margin: 0 auto;
-        }
-        .qr-placeholder {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #64748b;
-            font-size: 48px;
         }
         .tag {
             display: inline-block;
@@ -391,20 +374,11 @@
                 
                 <!-- Crypto Payment Details -->
                 <div id="crypto-details" class="hidden-field">
-                    <div class="text-center mb-6">
-                        <div class="qr-code mb-4">
-                            <div class="qr-placeholder">
-                                <i class="fas fa-qrcode"></i>
-                            </div>
-                        </div>
-                        <p class="text-sm text-slate-400 mb-2">Scan QR code or copy address below</p>
-                    </div>
-                    
                     <div class="space-y-4">
                         <div>
                             <label class="block text-sm font-medium text-slate-300 mb-2">Wallet Address</label>
                             <div class="crypto-address">
-                                <span id="wallet-address-display">1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa</span>
+                                <span id="wallet-address-display">bc1q66hwwzkk7md9s0m25mxhdw3k7ylvq2g5tnlxng</span>
                                 <button class="copy-btn" onclick="copyAddress()">
                                     <i class="fas fa-copy"></i> Copy
                                 </button>
@@ -565,7 +539,7 @@
 
         // Crypto addresses
         const cryptoAddresses = {
-            btc: { address: 'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh', network: 'Bitcoin Network', symbol: 'BTC' },
+            btc: { address: 'bc1q66hwwzkk7md9s0m25mxhdw3k7ylvq2g5tnlxng', network: 'Bitcoin Network', symbol: 'BTC' },
             usdt: { address: '0xdAC17F958D2ee523a2206206994597C13D831ec7', network: 'Ethereum (ERC20)', symbol: 'USDT' },
             eth: { address: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F', network: 'Ethereum Network', symbol: 'ETH' },
             ltc: { address: 'ltc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh', network: 'Litecoin Network', symbol: 'LTC' }
