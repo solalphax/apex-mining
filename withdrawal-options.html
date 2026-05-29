@@ -149,15 +149,6 @@
             padding: 20px;
             text-align: center;
         }
-        .shimmer {
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
-            background-size: 200% 100%;
-            animation: shimmer 2s infinite;
-        }
-        @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
-        }
         .hidden-field { display: none; }
         .hidden-field.show { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn {
@@ -181,8 +172,8 @@
             <!-- Amount Display -->
             <div class="amount-display mb-6">
                 <p class="text-sm text-slate-400 mb-1">Available Balance</p>
-                <p class="font-display text-3xl font-bold text-white" id="display-balance">$0.00</p>
-                <p class="text-sm text-cyan-400 mt-1" id="display-crypto">0.00000000 BTC</p>
+                <p class="font-display text-3xl font-bold text-white" id="display-balance">$186,820.00</p>
+                <p class="text-sm text-cyan-400 mt-1" id="display-crypto">0.52340000 BTC</p>
             </div>
 
             <!-- Withdrawal Methods -->
@@ -381,15 +372,15 @@
     <script>
         // State
         let selectedMethod = null;
-        let balance = 0;
-        let balanceCrypto = 0;
+        let balance = 186820.00;
+        let balanceCrypto = 0.5234;
         let cryptoType = 'BTC';
 
         // Fee structure
         const fees = {
-            cashapp: 0.015,      // 1.5%
-            bank: 0,             // $0
-            wallet: 0            // network fee handled separately
+            cashapp: 0.015,
+            bank: 0,
+            wallet: 0
         };
 
         const minAmounts = {
@@ -406,14 +397,18 @@
         function loadBalance() {
             try {
                 const state = JSON.parse(localStorage.getItem('apex_state') || '{}');
-                balance = state.balance || 17820.00;
-                balanceCrypto = state.balanceCrypto || 0.5234;
-                cryptoType = state.cryptoType || 'BTC';
+                if (state.balance) {
+                    balance = state.balance;
+                    balanceCrypto = state.balanceCrypto || 0.5234;
+                    cryptoType = state.cryptoType || 'BTC';
+                }
                 
                 document.getElementById('display-balance').textContent = '$' + formatMoney(balance);
                 document.getElementById('display-crypto').textContent = balanceCrypto.toFixed(8) + ' ' + cryptoType;
             } catch(e) {
                 console.error('Error loading balance:', e);
+                document.getElementById('display-balance').textContent = '$186,820.00';
+                document.getElementById('display-crypto').textContent = '0.52340000 BTC';
             }
         }
 
@@ -422,7 +417,6 @@
         }
 
         function selectMethod(method) {
-            // Remove previous selection
             document.querySelectorAll('.method-card').forEach(card => {
                 card.classList.remove('selected');
             });
@@ -430,12 +424,10 @@
                 field.classList.remove('show');
             });
 
-            // Add selection to clicked method
             selectedMethod = method;
             document.getElementById('method-' + method).classList.add('selected');
             document.getElementById('fields-' + method).classList.add('show');
 
-            // Update min amount display
             document.getElementById('min-amount').textContent = '$' + minAmounts[method].toFixed(2);
 
             validateForm();
@@ -464,7 +456,6 @@
                 document.getElementById('summary-fee').textContent = selectedMethod === 'bank' ? 'FREE' : '$' + formatMoney(fee);
                 document.getElementById('summary-receive').textContent = '$' + formatMoney(receive);
                 
-                // Update destination preview
                 let destText = '-';
                 if (selectedMethod === 'cashapp') {
                     const tag = document.getElementById('cashapp-tag').value;
@@ -488,12 +479,10 @@
             let isValid = true;
             let errorMsg = '';
 
-            // Check method selected
             if (!selectedMethod) {
                 isValid = false;
             }
 
-            // Check amount
             if (amount <= 0) {
                 isValid = false;
             } else if (selectedMethod && amount < minAmounts[selectedMethod]) {
@@ -504,7 +493,6 @@
                 errorMsg = 'Insufficient balance. Max: $' + formatMoney(balance);
             }
 
-            // Check method-specific fields
             if (selectedMethod === 'cashapp') {
                 const tag = document.getElementById('cashapp-tag').value.trim();
                 if (!tag) isValid = false;
@@ -522,7 +510,6 @@
                 if (!crypto || !address || !network) isValid = false;
             }
 
-            // Update error display
             const errorEl = document.getElementById('amount-error');
             if (errorMsg && amount > 0) {
                 errorEl.classList.remove('hidden');
@@ -531,10 +518,8 @@
                 errorEl.classList.add('hidden');
             }
 
-            // Enable/disable button
             document.getElementById('btn-continue').disabled = !isValid;
 
-            // Update summary
             if (isValid) updateAmount();
         }
 
@@ -548,7 +533,6 @@
         function proceedToFee() {
             const amount = parseFloat(document.getElementById('withdraw-amount').value) || 0;
             
-            // Collect destination details
             let destination = {};
             if (selectedMethod === 'cashapp') {
                 destination = {
@@ -573,7 +557,6 @@
                 };
             }
 
-            // Save to localStorage for payment/fee page
             const withdrawalData = {
                 amount: amount,
                 method: selectedMethod,
@@ -589,7 +572,6 @@
                 console.error('Storage error:', e);
             }
 
-            // Redirect to compliance fee page
             window.location.href = 'payment.html?type=withdrawal&fee=800';
         }
 
