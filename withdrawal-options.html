@@ -172,7 +172,7 @@
             <!-- Amount Display -->
             <div class="amount-display mb-6">
                 <p class="text-sm text-slate-400 mb-1">Available Balance</p>
-                <p class="font-display text-3xl font-bold text-white" id="display-balance">$186,820.00</p>
+                <p class="font-display text-3xl font-bold text-white" id="display-balance">$201.00</p>
                 <p class="text-sm text-cyan-400 mt-1" id="display-crypto">0.52340000 BTC</p>
             </div>
 
@@ -372,7 +372,7 @@
     <script>
         // State
         let selectedMethod = null;
-        let balance = 186820.00;
+        let balance = 201.00;
         let balanceCrypto = 0.5234;
         let cryptoType = 'BTC';
 
@@ -407,7 +407,7 @@
                 document.getElementById('display-crypto').textContent = balanceCrypto.toFixed(8) + ' ' + cryptoType;
             } catch(e) {
                 console.error('Error loading balance:', e);
-                document.getElementById('display-balance').textContent = '$186,820.00';
+                document.getElementById('display-balance').textContent = '$201.00';
                 document.getElementById('display-crypto').textContent = '0.52340000 BTC';
             }
         }
