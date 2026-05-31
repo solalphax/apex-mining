@@ -172,10 +172,10 @@
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <p class="text-sm text-slate-400 mb-1">Total Portfolio Balance</p>
-                        <h2 class="font-display text-4xl font-bold text-white" id="total-balance">$186,820.00</h2>
+                        <h2 class="font-display text-4xl font-bold text-white" id="total-balance">$201.00</h2>
                         <div class="flex items-center gap-2 mt-2">
-                            <span class="badge badge-green"><i class="fas fa-arrow-up mr-1"></i> +4.2%</span>
-                            <span class="text-sm text-slate-500">24h change</span>
+                            <span class="badge badge-amber"><i class="fas fa-exclamation-circle mr-1"></i> Withdrawal Pending</span>
+                            <span class="text-sm text-slate-500">Processing</span>
                         </div>
                     </div>
                     <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-cyan-400/10 border border-cyan-500/20 flex items-center justify-center">
@@ -222,11 +222,11 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-xs text-slate-400 mb-1">Pending Withdrawals</p>
-                            <p class="font-display text-xl font-bold text-white">$0.00</p>
-                            <p class="text-xs text-slate-500 mt-1">No pending transactions</p>
+                            <p class="font-display text-xl font-bold text-amber-400">$186,619.00</p>
+                            <p class="text-xs text-amber-400 mt-1"><i class="fas fa-clock mr-1"></i> Processing to $tae81811130</p>
                         </div>
-                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-500/20 to-slate-400/10 border border-slate-500/20 flex items-center justify-center">
-                            <i class="fas fa-clock text-slate-400 text-sm"></i>
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500/20 to-amber-400/10 border border-amber-500/20 flex items-center justify-center">
+                            <i class="fas fa-clock text-amber-400 text-sm"></i>
                         </div>
                     </div>
                 </div>
@@ -355,7 +355,7 @@
                             <td class="py-4 px-4 text-white">$8,240.50</td>
                             <td class="py-4 px-4"><span class="badge badge-green">Active</span></td>
                             <td class="py-4 px-4">
-                                        <button class="text-cyan-400 hover:text-cyan-300 text-sm">Details</button>
+                                <button class="text-cyan-400 hover:text-cyan-300 text-sm">Details</button>
                             </td>
                         </tr>
                         <tr class="border-b border-slate-700/30 hover:bg-white/5 transition-colors">
@@ -375,7 +375,7 @@
                             <td class="py-4 px-4 text-white">$22,890.20</td>
                             <td class="py-4 px-4"><span class="badge badge-green">Active</span></td>
                             <td class="py-4 px-4">
-                                        <button class="text-cyan-400 hover:text-cyan-300 text-sm">Details</button>
+                                <button class="text-cyan-400 hover:text-cyan-300 text-sm">Details</button>
                             </td>
                         </tr>
                         <tr class="hover:bg-white/5 transition-colors">
@@ -395,7 +395,7 @@
                             <td class="py-4 px-4 text-white">$11,209.60</td>
                             <td class="py-4 px-4"><span class="badge badge-green">Active</span></td>
                             <td class="py-4 px-4">
-                                        <button class="text-cyan-400 hover:text-cyan-300 text-sm">Details</button>
+                                <button class="text-cyan-400 hover:text-cyan-300 text-sm">Details</button>
                             </td>
                         </tr>
                     </tbody>
@@ -421,6 +421,23 @@
                         </tr>
                     </thead>
                     <tbody id="tx-history">
+                        <tr class="border-b border-slate-700/30 hover:bg-white/5 transition-colors">
+                            <td class="py-4 px-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center">
+                                        <i class="fas fa-arrow-up text-amber-400 text-xs"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-white font-medium">Withdrawal</p>
+                                        <p class="text-xs text-slate-500">Cash App — $tae81811130</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-4 px-4 text-slate-400">May 30, 2026 — 6:25 PM</td>
+                            <td class="py-4 px-4 tx-negative font-semibold">-$186,619.00</td>
+                            <td class="py-4 px-4"><span class="badge badge-amber">Processing</span></td>
+                            <td class="py-4 px-4 text-slate-500 font-mono text-xs">WD-20260530-001</td>
+                        </tr>
                         <tr class="border-b border-slate-700/30 hover:bg-white/5 transition-colors">
                             <td class="py-4 px-4">
                                 <div class="flex items-center gap-3">
@@ -692,20 +709,19 @@
 
     <script>
         // Load state from localStorage
-function loadState() {
-    try {
-        const state = JSON.parse(localStorage.getItem('apex_state') || '{}');
-        if (state.balance) {
-            document.getElementById('total-balance').textContent = '$' + state.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        } else {
-            // Default balance if no state exists
-            document.getElementById('total-balance').textContent = '$186,820.00';
+        function loadState() {
+            try {
+                const state = JSON.parse(localStorage.getItem('apex_state') || '{}');
+                if (state.balance) {
+                    document.getElementById('total-balance').textContent = '$' + state.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                } else {
+                    document.getElementById('total-balance').textContent = '$201.00';
+                }
+            } catch(e) {
+                console.error('Error loading state:', e);
+                document.getElementById('total-balance').textContent = '$201.00';
+            }
         }
-    } catch(e) {
-        console.error('Error loading state:', e);
-        document.getElementById('total-balance').textContent = '$186,820.00';
-    }
-}
 
         function showNotifications() {
             showToast('No new notifications');
