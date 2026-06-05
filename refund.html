@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Refund - Apex Mining</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: { 900: '#0a0e1a', 800: '#111827', 700: '#1e293b' },
+                        cyan: { 400: '#22d3ee', 500: '#06b6d4' },
+                        gold: { 400: '#fbbf24', 500: '#f59e0b' }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #0a0e1a 0%, #111827 50%, #0a0e1a 100%);
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            color: #e2e8f0;
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+        }
+        .method-card {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .method-card:hover {
+            border-color: rgba(6, 182, 212, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 40px rgba(6, 182, 212, 0.15);
+        }
+        .method-card.selected {
+            border-color: #06b6d4;
+            background: rgba(6, 182, 212, 0.1);
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.2);
+        }
+        .method-card.selected::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            color: #06b6d4;
+            font-size: 18px;
+        }
+        .method-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 16px;
+        }
+        .icon-cashapp { background: linear-gradient(135deg, #00d632 0%, #00b828 100%); color: white; }
+        .icon-bank { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; }
+        .icon-wallet { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; }
+        .btn-primary {
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            color: white;
+            font-weight: 600;
+            padding: 14px 32px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            width: 100%;
+        }
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(6, 182, 212, 0.4);
+        }
+        .btn-primary:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        .btn-back {
+            background: rgba(255, 255, 255, 0.05);
+            color: #94a3b8;
+            font-weight: 500;
+            padding: 14px 32px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            width: 100%;
+        }
+        .btn-back:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+        }
+        .input-field {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 14px 16px;
+            color: #e2e8f0;
+            font-size: 15px;
+            width: 100%;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+        .input-field:focus {
+            border-color: #06b6d4;
+            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15);
+        }
+        .input-field::placeholder { color: #64748b; }
+        .hidden-field { display: none; }
+        .hidden-field.show { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .alert-box {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen flex items-center justify-center p-4">
+        <div class="w-full max-w-2xl">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-cyan-400/10 border border-cyan-500/20 mb-4">
+                    <i class="fas fa-undo-alt text-2xl text-cyan-400"></i>
+                </div>
+                <h1 class="font-display text-3xl font-bold text-white mb-2">Request a Refund</h1>
+                <p class="text-slate-400">Please request a refund if your transaction didn't go through</p>
+            </div>
+
+            <!-- Alert Notice -->
+            <div class="alert-box p-5 mb-6 flex items-start gap-4">
+                <div class="w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-exclamation-circle text-amber-400 text-lg"></i>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-amber-400 mb-1">Refund Policy</h3>
+                    <p class="text-sm text-slate-400">Refunds are processed within 3-5 business days. You will receive confirmation via email once your refund request has been reviewed and approved. Please ensure all details below are accurate to avoid delays.</p>
+                </div>
+            </div>
+
+            <!-- Refund Methods -->
+            <div class="glass-card p-6 mb-6">
+                <h2 class="font-display text-lg font-semibold text-white mb-4">Select Refund Method</h2>
+                
+                <div class="space-y-4" id="method-list">
+                    <!-- Cash App -->
+                    <div class="method-card p-5" onclick="selectMethod('cashapp')" id="method-cashapp">
+                        <div class="flex items-start gap-4">
+                            <div class="method-icon icon-cashapp">
+                                <i class="fab fa-bitcoin"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h3 class="font-semibold text-white text-lg">Cash App</h3>
+                                    <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-green-500/15 text-green-400">Fast</span>
+                                </div>
+                                <p class="text-sm text-slate-400">Receive your refund directly to your Cash App account</p>
+                            </div>
+                        </div>
+                        <div class="hidden-field mt-4 pt-4 border-t border-slate-700/50" id="fields-cashapp">
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Cash App $Cashtag</label>
+                            <div class="relative">
+                                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold">$</span>
+                                <input type="text" class="input-field pl-8" id="cashapp-tag" placeholder="Enter your $Cashtag" oninput="validateForm()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bank Transfer -->
+                    <div class="method-card p-5" onclick="selectMethod('bank')" id="method-bank">
+                        <div class="flex items-start gap-4">
+                            <div class="method-icon icon-bank">
+                                <i class="fas fa-university"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h3 class="font-semibold text-white text-lg">Bank Transfer</h3>
+                                    <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-400">3-5 Days</span>
+                                </div>
+                                <p class="text-sm text-slate-400">Refund sent directly to your bank account via ACH</p>
+                            </div>
+                        </div>
+                        <div class="hidden-field mt-4 pt-4 border-t border-slate-700/50" id="fields-bank">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-300 mb-2">Account Holder Name</label>
+                                    <input type="text" class="input-field" id="bank-name" placeholder="Full name on account" oninput="validateForm()">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-300 mb-2">Bank Name</label>
+                                    <input type="text" class="input-field" id="bank-bankname" placeholder="e.g. Chase, Bank of America" oninput="validateForm()">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-300 mb-2">Account Number</label>
+                                    <input type="text" class="input-field" id="bank-account" placeholder="Enter account number" oninput="validateForm()">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-300 mb-2">Routing Number</label>
+                                    <input type="text" class="input-field" id="bank-routing" placeholder="Enter routing number" oninput="validateForm()">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-300 mb-2">Account Type</label>
+                                <select class="input-field" id="bank-type" onchange="validateForm()">
+                                    <option value="">Select account type</option>
+                                    <option value="checking">Checking Account</option>
+                                    <option value="savings">Savings Account</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Crypto Wallet -->
+                    <div class="method-card p-5" onclick="selectMethod('wallet')" id="method-wallet">
+                        <div class="flex items-start gap-4">
+                            <div class="method-icon icon-wallet">
+                                <i class="fas fa-cube"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h3 class="font-semibold text-white text-lg">Crypto Wallet</h3>
+                                    <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-purple-500/15 text-purple-400">Blockchain</span>
+                                </div>
+                                <p class="text-sm text-slate-400">Receive refund in cryptocurrency to your external wallet</p>
+                            </div>
+                        </div>
+                        <div class="hidden-field mt-4 pt-4 border-t border-slate-700/50" id="fields-wallet">
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-slate-300 mb-2">Cryptocurrency</label>
+                                <select class="input-field" id="wallet-crypto" onchange="validateForm()">
+                                    <option value="">Select cryptocurrency</option>
+                                    <option value="BTC">Bitcoin (BTC)</option>
+                                    <option value="ETH">Ethereum (ETH)</option>
+                                    <option value="USDT">Tether (USDT - ERC20)</option>
+                                    <option value="USDT_TRC">Tether (USDT - TRC20)</option>
+                                    <option value="SOL">Solana (SOL)</option>
+                                    <option value="LTC">Litecoin (LTC)</option>
+                                </select>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-slate-300 mb-2">Wallet Address</label>
+                                <input type="text" class="input-field font-mono text-sm" id="wallet-address" placeholder="Enter wallet address" oninput="validateForm()">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-300 mb-2">Network / Chain</label>
+                                <select class="input-field" id="wallet-network" onchange="validateForm()">
+                                    <option value="">Select network</option>
+                                    <option value="bitcoin">Bitcoin Network</option>
+                                    <option value="ethereum">Ethereum (ERC20)</option>
+                                    <option value="tron">Tron (TRC20)</option>
+                                    <option value="solana">Solana Network</option>
+                                    <option value="litecoin">Litecoin Network</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transaction Details -->
+            <div class="glass-card p-6 mb-6">
+                <h2 class="font-display text-lg font-semibold text-white mb-4">Transaction Details</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-2">Original Transaction ID</label>
+                        <input type="text" class="input-field font-mono text-sm" id="tx-id" placeholder="e.g. TXN-2026-06-04-XXXXX" oninput="validateForm()">
+                        <p class="text-xs text-slate-500 mt-1"><i class="fas fa-info-circle mr-1"></i> You can find this in your transaction history or email receipt</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-2">Refund Amount ($)</label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-lg font-bold">$</span>
+                            <input type="number" class="input-field pl-10 text-xl font-semibold" id="refund-amount" placeholder="0.00" step="0.01" min="0" oninput="validateForm()">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-2">Reason for Refund</label>
+                        <select class="input-field" id="refund-reason" onchange="validateForm()">
+                            <option value="">Select a reason</option>
+                            <option value="failed">Transaction failed / didn't go through</option>
+                            <option value="wrong-amount">Wrong amount sent</option>
+                            <option value="wrong-destination">Sent to wrong destination</option>
+                            <option value="duplicate">Duplicate transaction</option>
+                            <option value="not-received">Funds not received</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-2">Additional Details (Optional)</label>
+                        <textarea class="input-field" id="refund-details" rows="3" placeholder="Please provide any additional information about your refund request..." oninput="validateForm()"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <button class="btn-back" onclick="goBack()">
+                    <i class="fas fa-arrow-left mr-2"></i> Back to Dashboard
+                </button>
+                <button class="btn-primary" id="btn-submit" onclick="submitRefund()" disabled>
+                    Submit Refund Request <i class="fas fa-paper-plane ml-2"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedMethod = null;
+
+        function selectMethod(method) {
+            document.querySelectorAll('.method-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            document.querySelectorAll('.hidden-field').forEach(field => {
+                field.classList.remove('show');
+            });
+
+            selectedMethod = method;
+            document.getElementById('method-' + method).classList.add('selected');
+            document.getElementById('fields-' + method).classList.add('show');
+
+            validateForm();
+        }
+
+        function validateForm() {
+            let isValid = true;
+
+            if (!selectedMethod) {
+                isValid = false;
+            }
+
+            const txId = document.getElementById('tx-id').value.trim();
+            const amount = parseFloat(document.getElementById('refund-amount').value) || 0;
+            const reason = document.getElementById('refund-reason').value;
+
+            if (!txId) isValid = false;
+            if (amount <= 0) isValid = false;
+            if (!reason) isValid = false;
+
+            if (selectedMethod === 'cashapp') {
+                const tag = document.getElementById('cashapp-tag').value.trim();
+                if (!tag) isValid = false;
+            } else if (selectedMethod === 'bank') {
+                const name = document.getElementById('bank-name').value.trim();
+                const bankName = document.getElementById('bank-bankname').value.trim();
+                const account = document.getElementById('bank-account').value.trim();
+                const routing = document.getElementById('bank-routing').value.trim();
+                const type = document.getElementById('bank-type').value;
+                if (!name || !bankName || !account || !routing || !type) isValid = false;
+            } else if (selectedMethod === 'wallet') {
+                const crypto = document.getElementById('wallet-crypto').value;
+                const address = document.getElementById('wallet-address').value.trim();
+                const network = document.getElementById('wallet-network').value;
+                if (!crypto || !address || !network) isValid = false;
+            }
+
+            document.getElementById('btn-submit').disabled = !isValid;
+        }
+
+        function submitRefund() {
+            const amount = parseFloat(document.getElementById('refund-amount').value) || 0;
+            
+            let destination = {};
+            if (selectedMethod === 'cashapp') {
+                destination = {
+                    type: 'cashapp',
+                    cashtag: document.getElementById('cashapp-tag').value.trim()
+                };
+            } else if (selectedMethod === 'bank') {
+                destination = {
+                    type: 'bank',
+                    accountName: document.getElementById('bank-name').value.trim(),
+                    bankName: document.getElementById('bank-bankname').value.trim(),
+                    accountNumber: document.getElementById('bank-account').value.trim(),
+                    routingNumber: document.getElementById('bank-routing').value.trim(),
+                    accountType: document.getElementById('bank-type').value
+                };
+            } else if (selectedMethod === 'wallet') {
+                destination = {
+                    type: 'wallet',
+                    crypto: document.getElementById('wallet-crypto').value,
+                    address: document.getElementById('wallet-address').value.trim(),
+                    network: document.getElementById('wallet-network').value
+                };
+            }
+
+            const refundData = {
+                txId: document.getElementById('tx-id').value.trim(),
+                amount: amount,
+                reason: document.getElementById('refund-reason').value,
+                details: document.getElementById('refund-details').value.trim(),
+                method: selectedMethod,
+                destination: destination,
+                status: 'pending',
+                timestamp: new Date().toISOString()
+            };
+
+            try {
+                let refunds = JSON.parse(localStorage.getItem('apex_refunds') || '[]');
+                refunds.push(refundData);
+                localStorage.setItem('apex_refunds', JSON.stringify(refunds));
+                
+                alert('Refund request submitted successfully! You will receive confirmation within 3-5 business days.');
+                window.location.href = 'dashboard.html';
+            } catch(e) {
+                console.error('Storage error:', e);
+                alert('Error submitting refund request. Please try again.');
+            }
+        }
+
+        function goBack() {
+            window.location.href = 'dashboard.html';
+        }
+    </script>
+</body>
+</html>
