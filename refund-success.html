@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Refund Submitted - Apex Mining</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: { 900: '#0a0e1a', 800: '#111827', 700: '#1e293b' },
+                        cyan: { 400: '#22d3ee', 500: '#06b6d4' },
+                        gold: { 400: '#fbbf24', 500: '#f59e0b' }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #0a0e1a 0%, #111827 50%, #0a0e1a 100%);
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            color: #e2e8f0;
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+        }
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(34, 197, 94, 0.1) 100%);
+            border: 2px solid rgba(34, 197, 94, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: scaleIn 0.5s ease;
+        }
+        @keyframes scaleIn {
+            from { transform: scale(0); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            color: white;
+            font-weight: 600;
+            padding: 14px 32px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(6, 182, 212, 0.4);
+        }
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: #94a3b8;
+            font-weight: 500;
+            padding: 14px 32px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+        }
+        .receipt-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .receipt-row:last-child {
+            border-bottom: none;
+        }
+        .confetti {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        .confetti-piece {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #06b6d4;
+            animation: confetti-fall 3s ease-out forwards;
+        }
+        @keyframes confetti-fall {
+            0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .status-pending {
+            background: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="confetti" class="confetti"></canvas>
+    
+    <div class="min-h-screen flex items-center justify-center p-4">
+        <div class="w-full max-w-lg">
+            <!-- Success Header -->
+            <div class="text-center mb-8">
+                <div class="success-icon mx-auto mb-6">
+                    <i class="fas fa-check text-4xl text-green-400"></i>
+                </div>
+                <h1 class="font-display text-3xl font-bold text-white mb-2">Refund Requested</h1>
+                <p class="text-slate-400 mb-4">Your refund has been submitted successfully</p>
+                <div class="status-badge status-pending mx-auto">
+                    <i class="fas fa-clock"></i>
+                    <span>Processing - 30 Minutes</span>
+                </div>
+            </div>
+
+            <!-- Receipt Card -->
+            <div class="glass-card p-6 mb-6">
+                <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-700/50">
+                    <div class="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center">
+                        <i class="fas fa-receipt text-cyan-400"></i>
+                    </div>
+                    <div>
+                        <h2 class="font-semibold text-white">Refund Receipt</h2>
+                        <p class="text-xs text-slate-500" id="receipt-date">June 5, 2026 at 1:35 PM</p>
+                    </div>
+                </div>
+
+                <div class="receipt-row">
+                    <span class="text-slate-400">Transaction ID</span>
+                    <span class="text-white font-mono text-sm" id="receipt-tx">-</span>
+                </div>
+                <div class="receipt-row">
+                    <span class="text-slate-400">Refund Amount</span>
+                    <span class="text-white font-semibold" id="receipt-amount">-</span>
+                </div>
+                <div class="receipt-row">
+                    <span class="text-slate-400">Refund Method</span>
+                    <span class="text-white" id="receipt-method">-</span>
+                </div>
+                <div class="receipt-row">
+                    <span class="text-slate-400">Destination</span>
+                    <span class="text-white text-sm" id="receipt-destination">-</span>
+                </div>
+                <div class="receipt-row">
+                    <span class="text-slate-400">Reason</span>
+                    <span class="text-white text-sm" id="receipt-reason">-</span>
+                </div>
+                <div class="receipt-row">
+                    <span class="text-slate-400">Reference Number</span>
+                    <span class="text-cyan-400 font-mono text-sm" id="receipt-ref">-</span>
+                </div>
+            </div>
+
+            <!-- Email Notice -->
+            <div class="glass-card p-5 mb-6" style="border-color: rgba(6, 182, 212, 0.2);">
+                <div class="flex items-start gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-envelope text-cyan-400 text-sm"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-white text-sm mb-1">Email Confirmation Sent</h3>
+                        <p class="text-xs text-slate-400">A confirmation email has been sent to your registered email address with your refund details and tracking information.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <button class="btn-secondary" onclick="viewEmailMockup()">
+                    <i class="fas fa-envelope-open mr-2"></i> View Email Preview
+                </button>
+                <button class="btn-primary" onclick="goToDashboard()">
+                    <i class="fas fa-home mr-2"></i> Back to Dashboard
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Confetti Animation
+        function launchConfetti() {
+            const canvas = document.getElementById('confetti');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const colors = ['#06b6d4', '#22d3ee', '#f59e0b', '#fbbf24', '#22c55e', '#a855f7'];
+            const pieces = [];
+            const pieceCount = 100;
+
+            for (let i = 0; i < pieceCount; i++) {
+                pieces.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height - canvas.height,
+                    w: Math.random() * 10 + 5,
+                    h: Math.random() * 10 + 5,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    speed: Math.random() * 3 + 2,
+                    rotation: Math.random() * 360,
+                    rotationSpeed: Math.random() * 10 - 5
+                });
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                let active = false;
+
+                pieces.forEach(p => {
+                    p.y += p.speed;
+                    p.rotation += p.rotationSpeed;
+                    
+                    if (p.y < canvas.height) {
+                        active = true;
+                        ctx.save();
+                        ctx.translate(p.x, p.y);
+                        ctx.rotate((p.rotation * Math.PI) / 180);
+                        ctx.fillStyle = p.color;
+                        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+                        ctx.restore();
+                    }
+                });
+
+                if (active) requestAnimationFrame(animate);
+            }
+
+            animate();
+        }
+
+        // Load refund data
+        function loadReceipt() {
+            try {
+                const refunds = JSON.parse(localStorage.getItem('apex_refunds') || '[]');
+                const lastRefund = refunds[refunds.length - 1];
+
+                if (lastRefund) {
+                    document.getElementById('receipt-tx').textContent = lastRefund.txId || 'N/A';
+                    document.getElementById('receipt-amount').textContent = '$' + parseFloat(lastRefund.amount).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                    
+                    const methodNames = { cashapp: 'Cash App', bank: 'Bank Transfer', wallet: 'Crypto Wallet' };
+                    document.getElementById('receipt-method').textContent = methodNames[lastRefund.method] || lastRefund.method;
+
+                    let destText = '-';
+                    if (lastRefund.method === 'cashapp') {
+                        destText = '$' + (lastRefund.destination.cashtag || '');
+                    } else if (lastRefund.method === 'bank') {
+                        destText = (lastRefund.destination.bankName || '') + ' ****' + (lastRefund.destination.accountNumber || '').slice(-4);
+                    } else if (lastRefund.method === 'wallet') {
+                        destText = (lastRefund.destination.crypto || '') + ': ' + (lastRefund.destination.address || '').substring(0, 12) + '...';
+                    }
+                    document.getElementById('receipt-destination').textContent = destText;
+
+                    const reasonNames = {
+                        failed: 'Transaction failed',
+                        'wrong-amount': 'Wrong amount sent',
+                        'wrong-destination': 'Sent to wrong destination',
+                        duplicate: 'Duplicate transaction',
+                        'not-received': 'Funds not received',
+                        other: 'Other'
+                    };
+                    document.getElementById('receipt-reason').textContent = reasonNames[lastRefund.reason] || lastRefund.reason;
+
+                    // Generate reference number
+                    const refNum = 'REF-' + Date.now().toString(36).toUpperCase();
+                    document.getElementById('receipt-ref').textContent = refNum;
+
+                    // Set date
+                    const now = new Date();
+                    document.getElementById('receipt-date').textContent = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) + ' at ' + now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+                }
+            } catch(e) {
+                console.error('Error loading receipt:', e);
+            }
+        }
+
+        function viewEmailMockup() {
+            window.location.href = 'refund-email.html';
+        }
+
+        function goToDashboard() {
+            window.location.href = 'dashboard.html';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            launchConfetti();
+            loadReceipt();
+        });
+    </script>
+</body>
+</html>
