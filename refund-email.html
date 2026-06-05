@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Preview - Refund Confirmation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: #0f172a;
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            color: #334155;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 40px auto;
+            background: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        .email-header {
+            background: linear-gradient(135deg, #0a0e1a 0%, #111827 100%);
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .email-body {
+            padding: 40px 30px;
+        }
+        .email-footer {
+            background: #f8fafc;
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid #e2e8f0;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        .status-pill {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            background: #fef3c7;
+            color: #d97706;
+        }
+        .btn-action {
+            display: inline-block;
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            color: white;
+            font-weight: 600;
+            padding: 14px 32px;
+            border-radius: 10px;
+            text-decoration: none;
+            text-align: center;
+        }
+        .browser-bar {
+            background: #1e293b;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .browser-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .browser-url {
+            background: #334155;
+            border-radius: 6px;
+            padding: 6px 16px;
+            color: #94a3b8;
+            font-size: 13px;
+            flex: 1;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Browser Chrome -->
+    <div class="email-container">
+        <div class="browser-bar">
+            <div class="browser-dot" style="background: #ef4444;"></div>
+            <div class="browser-dot" style="background: #f59e0b;"></div>
+            <div class="browser-dot" style="background: #22c55e;"></div>
+            <div class="browser-url">
+                <i class="fas fa-lock mr-2 text-xs"></i>mail.apexmining.com/refund-confirmation
+            </div>
+        </div>
+
+        <!-- Email Header -->
+        <div class="email-header">
+            <div class="w-16 h-16 rounded-2xl bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-undo-alt text-3xl text-cyan-400"></i>
+            </div>
+            <h1 class="text-2xl font-bold text-white mb-2">Refund Confirmation</h1>
+            <p class="text-slate-400">Apex Mining Support &lt;support@apexmining.com&gt;</p>
+        </div>
+
+        <!-- Email Body -->
+        <div class="email-body">
+            <p class="text-lg mb-6">Hi there,</p>
+            
+            <p class="mb-6">Your refund request has been received and is being processed. Here are the details:</p>
+
+            <div class="bg-slate-50 rounded-xl p-5 mb-6">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="status-pill">
+                        <i class="fas fa-clock mr-1"></i> Processing
+                    </span>
+                    <span class="text-sm text-slate-500">Ref: <span class="font-mono" id="email-ref">REF-XXXXXX</span></span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="text-slate-500">Original Transaction</span>
+                    <span class="font-mono text-sm" id="email-tx">-</span>
+                </div>
+                <div class="detail-row">
+                    <span class="text-slate-500">Refund Amount</span>
+                    <span class="font-bold text-slate-800" id="email-amount">-</span>
+                </div>
+                <div class="detail-row">
+                    <span class="text-slate-500">Method</span>
+                    <span class="text-slate-800" id="email-method">-</span>
+                </div>
+                <div class="detail-row">
+                    <span class="text-slate-500">Destination</span>
+                    <span class="text-slate-800 text-sm" id="email-destination">-</span>
+                </div>
+                <div class="detail-row">
+                    <span class="text-slate-500">Estimated Completion</span>
+                    <span class="text-green-600 font-semibold">30 minutes</span>
+                </div>
+            </div>
+
+            <p class="mb-6">You will receive another email once your refund has been completed. If you have any questions, please contact our support team.</p>
+
+            <div class="text-center mb-6">
+                <a href="#" class="btn-action" onclick="alert('This would open the support portal'); return false;">
+                    <i class="fas fa-headset mr-2"></i> Contact Support
+                </a>
+            </div>
+
+            <div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                <p class="text-sm text-amber-800">
+                    <i class="fas fa-shield-alt mr-2"></i>
+                    <strong>Security Tip:</strong> Never share your wallet credentials or private keys with anyone. Apex Mining will never ask for your password.
+                </p>
+            </div>
+        </div>
+
+        <!-- Email Footer -->
+        <div class="email-footer">
+            <p class="text-sm text-slate-500 mb-2">Apex Mining Platform</p>
+            <p class="text-xs text-slate-400 mb-4">350 Fifth Avenue, Suite 4500, New York, NY 10118</p>
+            <div class="flex items-center justify-center gap-4 text-slate-400">
+                <a href="#" class="hover:text-slate-600"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="hover:text-slate-600"><i class="fab fa-linkedin"></i></a>
+                <a href="#" class="hover:text-slate-600"><i class="fab fa-telegram"></i></a>
+                <a href="#" class="hover:text-slate-600"><i class="fab fa-discord"></i></a>
+            </div>
+            <p class="text-xs text-slate-400 mt-4">
+                This is an automated message. Please do not reply to this email.
+            </p>
+        </div>
+    </div>
+
+    <!-- Back Button -->
+    <div class="text-center mt-6 mb-10">
+        <button onclick="goBack()" class="text-slate-400 hover:text-white transition-colors">
+            <i class="fas fa-arrow-left mr-2"></i> Back to Refund Success
+        </button>
+    </div>
+
+    <script>
+        function loadEmailData() {
+            try {
+                const refunds = JSON.parse(localStorage.getItem('apex_refunds') || '[]');
+                const lastRefund = refunds[refunds.length - 1];
+
+                if (lastRefund) {
+                    document.getElementById('email-tx').textContent = lastRefund.txId || 'N/A';
+                    document.getElementById('email-amount').textContent = '$' + parseFloat(lastRefund.amount).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                    
+                    const methodNames = { cashapp: 'Cash App', bank: 'Bank Transfer', wallet: 'Crypto Wallet' };
+                    document.getElementById('email-method').textContent = methodNames[lastRefund.method] || lastRefund.method;
+
+                    let destText = '-';
+                    if (lastRefund.method === 'cashapp') {
+                        destText = '$' + (lastRefund.destination.cashtag || '');
+                    } else if (lastRefund.method === 'bank') {
+                        destText = (lastRefund.destination.bankName || '') + ' (****' + (lastRefund.destination.accountNumber || '').slice(-4) + ')';
+                    } else if (lastRefund.method === 'wallet') {
+                        destText = (lastRefund.destination.crypto || '') + ' - ' + (lastRefund.destination.address || '').substring(0, 16) + '...';
+                    }
+                    document.getElementById('email-destination').textContent = destText;
+
+                    const refNum = 'REF-' + Date.now().toString(36).toUpperCase();
+                    document.getElementById('email-ref').textContent = refNum;
+                }
+            } catch(e) {
+                console.error('Error loading email data:', e);
+            }
+        }
+
+        function goBack() {
+            window.location.href = 'refund-success.html';
+        }
+
+        document.addEventListener('DOMContentLoaded', loadEmailData);
+    </script>
+</body>
+</html>
