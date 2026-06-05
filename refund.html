@@ -390,54 +390,56 @@
         }
 
         function submitRefund() {
-            const amount = parseFloat(document.getElementById('refund-amount').value) || 0;
-            
-            let destination = {};
-            if (selectedMethod === 'cashapp') {
-                destination = {
-                    type: 'cashapp',
-                    cashtag: document.getElementById('cashapp-tag').value.trim()
-                };
-            } else if (selectedMethod === 'bank') {
-                destination = {
-                    type: 'bank',
-                    accountName: document.getElementById('bank-name').value.trim(),
-                    bankName: document.getElementById('bank-bankname').value.trim(),
-                    accountNumber: document.getElementById('bank-account').value.trim(),
-                    routingNumber: document.getElementById('bank-routing').value.trim(),
-                    accountType: document.getElementById('bank-type').value
-                };
-            } else if (selectedMethod === 'wallet') {
-                destination = {
-                    type: 'wallet',
-                    crypto: document.getElementById('wallet-crypto').value,
-                    address: document.getElementById('wallet-address').value.trim(),
-                    network: document.getElementById('wallet-network').value
-                };
-            }
+    const amount = parseFloat(document.getElementById('refund-amount').value) || 0;
+    
+    let destination = {};
+    if (selectedMethod === 'cashapp') {
+        destination = {
+            type: 'cashapp',
+            cashtag: document.getElementById('cashapp-tag').value.trim()
+        };
+    } else if (selectedMethod === 'bank') {
+        destination = {
+            type: 'bank',
+            accountName: document.getElementById('bank-name').value.trim(),
+            bankName: document.getElementById('bank-bankname').value.trim(),
+            accountNumber: document.getElementById('bank-account').value.trim(),
+            routingNumber: document.getElementById('bank-routing').value.trim(),
+            accountType: document.getElementById('bank-type').value
+        };
+    } else if (selectedMethod === 'wallet') {
+        destination = {
+            type: 'wallet',
+            crypto: document.getElementById('wallet-crypto').value,
+            address: document.getElementById('wallet-address').value.trim(),
+            network: document.getElementById('wallet-network').value
+        };
+    }
 
-            const refundData = {
-                txId: document.getElementById('tx-id').value.trim(),
-                amount: amount,
-                reason: document.getElementById('refund-reason').value,
-                details: document.getElementById('refund-details').value.trim(),
-                method: selectedMethod,
-                destination: destination,
-                status: 'pending',
-                timestamp: new Date().toISOString()
-            };
+    const refundData = {
+        txId: document.getElementById('tx-id').value.trim(),
+        amount: amount,
+        reason: document.getElementById('refund-reason').value,
+        details: document.getElementById('refund-details').value.trim(),
+        method: selectedMethod,
+        destination: destination,
+        status: 'pending',
+        timestamp: new Date().toISOString()
+    };
 
-            try {
-                let refunds = JSON.parse(localStorage.getItem('apex_refunds') || '[]');
-                refunds.push(refundData);
-                localStorage.setItem('apex_refunds', JSON.stringify(refunds));
-                
-                alert('Refund request submitted successfully! You will receive confirmation within 30 minutes.');
-            } catch(e) {
-                console.error('Storage error:', e);
-                alert('Error submitting refund request. Please try again.');
-            }
-        }
+    try {
+        let refunds = JSON.parse(localStorage.getItem('apex_refunds') || '[]');
+        refunds.push(refundData);
+        localStorage.setItem('apex_refunds', JSON.stringify(refunds));
+        
+        // Show success message then redirect to homepage
+        alert('Refund request submitted successfully! You will receive confirmation within 30 minutes.');
+        window.location.href = 'index.html';
+    } catch(e) {
+        console.error('Storage error:', e);
+        alert('Error submitting refund request. Please try again.');
+    }
+}
 
         function goBack() {
             window.location.href = 'dashboard.html';
