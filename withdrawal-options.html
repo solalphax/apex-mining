@@ -200,16 +200,28 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- Cash App Detail Fields -->
-                        <div class="hidden-field mt-4 pt-4 border-t border-slate-700/50" id="fields-cashapp">
-                            <label class="block text-sm font-medium text-slate-300 mb-2">Cash App $Cashtag</label>
-                            <div class="relative">
-                                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold">$</span>
-                                <input type="text" class="input-field pl-8" id="cashapp-tag" placeholder="Enter your $Cashtag (e.g., johnsmith)" oninput="validateForm()">
-                            </div>
-                            <p class="text-xs text-slate-500 mt-2"><i class="fas fa-info-circle mr-1"></i> Funds will be sent to this Cash App account</p>
-                        </div>
-                    </div>
+    <!-- Cash App Detail Fields -->
+    <div class="hidden-field mt-4 pt-4 border-t border-slate-700/50" id="fields-cashapp">
+     <label class="block text-sm font-medium text-slate-300 mb-2">Cash App $Cashtag</label>
+      <div class="relative">
+        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold">$</span>
+        <input type="text" class="input-field pl-8" id="cashapp-tag" placeholder="Enter your $Cashtag (e.g., johnsmith)" oninput="validateCashApp()">
+    </div>
+    
+    <!-- Validation Status -->
+    <div id="cashapp-validation" class="mt-2 hidden">
+     <div id="validating-msg" class="flex items-center gap-2 text-xs text-slate-400">
+       <i class="fas fa-spinner fa-spin"></i>
+         <span>Validating Cash App account...</span>
+        </div>
+        <div id="success-msg" class="flex items-center gap-2 text-xs text-green-400 hidden">
+            <i class="fas fa-check-circle"></i>
+            <span>Cash App successfully validated</span>
+        </div>
+    </div>
+    
+    <p class="text-xs text-slate-500 mt-2"><i class="fas fa-info-circle mr-1"></i> Funds will be sent to this Cash App account</p>
+</div>
 
                     <!-- Bank / ACH Transfer -->
                     <div class="method-card p-5" onclick="selectMethod('bank')" id="method-bank">
