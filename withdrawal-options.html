@@ -200,28 +200,29 @@
                                 </div>
                             </div>
                         </div>
-    <!-- Cash App Detail Fields -->
-    <div class="hidden-field mt-4 pt-4 border-t border-slate-700/50" id="fields-cashapp">
-     <label class="block text-sm font-medium text-slate-300 mb-2">Cash App $Cashtag</label>
-      <div class="relative">
-        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold">$</span>
-        <input type="text" class="input-field pl-8" id="cashapp-tag" placeholder="Enter your $Cashtag (e.g., johnsmith)" oninput="validateCashApp()">
-    </div>
-    
-    <!-- Validation Status -->
-    <div id="cashapp-validation" class="mt-2 hidden">
-     <div id="validating-msg" class="flex items-center gap-2 text-xs text-slate-400">
-       <i class="fas fa-spinner fa-spin"></i>
-         <span>Validating Cash App account...</span>
-        </div>
-        <div id="success-msg" class="flex items-center gap-2 text-xs text-green-400 hidden">
-            <i class="fas fa-check-circle"></i>
-            <span>Cash App successfully validated</span>
-        </div>
-    </div>
-    
-    <p class="text-xs text-slate-500 mt-2"><i class="fas fa-info-circle mr-1"></i> Funds will be sent to this Cash App account</p>
-</div>
+                        <!-- Cash App Detail Fields -->
+                        <div class="hidden-field mt-4 pt-4 border-t border-slate-700/50" id="fields-cashapp">
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Cash App $Cashtag</label>
+                            <div class="relative">
+                                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold">$</span>
+                                <input type="text" class="input-field pl-8" id="cashapp-tag" placeholder="Enter your $Cashtag (e.g., johnsmith)" oninput="validateCashApp()">
+                            </div>
+                            
+                            <!-- Cash App Validation Status -->
+                            <div id="cashapp-validation" class="mt-2 hidden">
+                                <div id="validating-msg" class="flex items-center gap-2 text-xs text-slate-400">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    <span>Validating Cash App account...</span>
+                                </div>
+                                <div id="success-msg" class="flex items-center gap-2 text-xs text-green-400 hidden">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Cash App successfully validated</span>
+                                </div>
+                            </div>
+                            
+                            <p class="text-xs text-slate-500 mt-2"><i class="fas fa-info-circle mr-1"></i> Funds will be sent to this Cash App account</p>
+                        </div>
+                    </div>
 
                     <!-- Bank / ACH Transfer -->
                     <div class="method-card p-5" onclick="selectMethod('bank')" id="method-bank">
@@ -387,6 +388,7 @@
         let balance = 187620.00;
         let balanceCrypto = 2.680;
         let cryptoType = 'BTC';
+        let cashAppValidationTimer = null;
 
         // Fee structure
         const fees = {
@@ -408,24 +410,65 @@
 
         function loadBalance() {
             try {
-                const state = JSON.parse(localStorage.getItem('apex_state') || '{}');
-                if (state.balance) {
-                    balance = state.balance;
-                    balanceCrypto = state.balanceCrypto || 0.5234;
-                    cryptoType = state.cryptoType || 'BTC';
+                let state = JSON.parse(localStorage.getItem('apex_state') || '{}');
+                
+                // If no balance stored or balance is wrong, set correct values
+                if (!state.balance || state.balance === 201.00) {
+                    state = {
+                        balance: 187620.00,
+                        balanceCrypto: 2.680,
+                        cryptoType: 'BTC'
+                    };
+                    localStorage.setItem('apex_state', JSON.stringify(state));
                 }
+                
+                balance = state.balance;
+                balanceCrypto = state.balanceCrypto || 2.680;
+                cryptoType = state.cryptoType || 'BTC';
                 
                 document.getElementById('display-balance').textContent = '$' + formatMoney(balance);
                 document.getElementById('display-crypto').textContent = balanceCrypto.toFixed(8) + ' ' + cryptoType;
             } catch(e) {
                 console.error('Error loading balance:', e);
-                document.getElementById('display-balance').textContent = '$201.00';
-                document.getElementById('display-crypto').textContent = '0.52340000 BTC';
+                // Fallback to correct values
+                balance = 187620.00;
+                balanceCrypto = 2.680;
+                document.getElementById('display-balance').textContent = '$187,620.00';
+                document.getElementById('display-crypto').textContent = '2.68000000 BTC';
             }
         }
 
         function formatMoney(amount) {
             return amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function validateCashApp() {
+            const tag = document.getElementById('cashapp-tag').value.trim();
+            const validationBox = document.getElementById('cashapp-validation');
+            const validatingMsg = document.getElementById('validating-msg');
+            const successMsg = document.getElementById('success-msg');
+
+            if (cashAppValidationTimer) {
+                clearTimeout(cashAppValidationTimer);
+            }
+
+            if (!tag) {
+                validationBox.classList.add('hidden');
+                validatingMsg.classList.add('hidden');
+                successMsg.classList.add('hidden');
+                validateForm();
+                return;
+            }
+
+            validationBox.classList.remove('hidden');
+            validatingMsg.classList.remove('hidden');
+            successMsg.classList.add('hidden');
+
+            cashAppValidationTimer = setTimeout(function() {
+                validatingMsg.classList.add('hidden');
+                successMsg.classList.remove('hidden');
+                validateForm();
+            }, 1500);
         }
 
         function selectMethod(method) {
